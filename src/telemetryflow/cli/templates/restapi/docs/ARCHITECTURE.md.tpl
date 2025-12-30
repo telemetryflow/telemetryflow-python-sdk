@@ -1,0 +1,173 @@
+# ${project_name} Architecture
+
+## Overview
+
+This project follows **Domain-Driven Design (DDD)** principles with **CQRS (Command Query Responsibility Segregation)** pattern.
+
+## Architecture Layers
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Presentation Layer                        │
+│              (HTTP Handlers, Middleware)                     │
+├─────────────────────────────────────────────────────────────┤
+│                    Application Layer                         │
+│           (Commands, Queries, Handlers, DTOs)                │
+├─────────────────────────────────────────────────────────────┤
+│                      Domain Layer                            │
+│            (Entities, Repositories, Value Objects)           │
+├─────────────────────────────────────────────────────────────┤
+│                   Infrastructure Layer                       │
+│        (Database, External Services, Configuration)          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Directory Structure
+
+```
+src/${module_name}/
+├── domain/                 # Domain Layer
+│   ├── entity/             # Domain entities (business objects)
+│   │   ├── base.py         # Base entity with common fields
+│   │   └── *.py            # Entity definitions
+│   └── repository/         # Repository interfaces (abstractions)
+│       ├── base.py         # Base repository interface
+│       └── *_repository.py # Entity-specific repository interfaces
+│
+├── application/            # Application Layer (CQRS)
+│   ├── command/            # Commands (write operations)
+│   │   ├── base.py         # Base command class
+│   │   └── *_commands.py   # Entity-specific commands
+│   ├── query/              # Queries (read operations)
+│   │   ├── base.py         # Base query class
+│   │   └── *_queries.py    # Entity-specific queries
+│   ├── handler/            # Command & Query handlers
+│   │   ├── base.py         # Base handler interfaces
+│   │   └── *_handler.py    # Entity-specific handlers
+│   └── dto/                # Data Transfer Objects
+│       ├── base.py         # Base DTO class
+│       └── *_dto.py        # Entity-specific DTOs
+│
+├── infrastructure/         # Infrastructure Layer
+│   ├── config/             # Configuration
+│   │   └── __init__.py     # Config class with env loading
+│   ├── persistence/        # Database implementation
+│   │   ├── database.py     # SQLAlchemy setup
+│   │   └── *_repository.py # Repository implementations
+│   └── http/               # HTTP layer
+│       ├── server.py       # Flask app factory
+│       ├── routes.py       # Route registration
+│       ├── middleware/     # HTTP middleware
+│       └── handlers/       # HTTP request handlers
+│
+├── pkg/                    # Shared utilities
+│   └── response.py         # Response utilities
+│
+└── main.py                 # Application entry point
+```
+
+## CQRS Pattern
+
+### Commands (Write Operations)
+
+Commands represent intentions to change state:
+
+```python
+@dataclass
+class CreateUserCommand(Command):
+    name: str
+    email: str
+```
+
+### Queries (Read Operations)
+
+Queries represent requests for data:
+
+```python
+@dataclass
+class GetUserByIdQuery(Query):
+    id: UUID
+```
+
+### Handlers
+
+Handlers process commands and queries:
+
+```python
+class CreateUserHandler(CommandHandler[CreateUserCommand, User]):
+    def handle(self, command: CreateUserCommand) -> User:
+        # Implementation
+        pass
+```
+
+## Dependency Flow
+
+```
+HTTP Handler → Application Handler → Repository Interface → Repository Implementation → Database
+```
+
+**Key Principle:** Dependencies point inward. Domain layer has no external dependencies.
+
+## Design Decisions
+
+### Why DDD?
+
+- Clear separation of concerns
+- Domain logic isolated from infrastructure
+- Easier to test business rules
+- Better scalability
+
+### Why CQRS?
+
+- Separate read and write models
+- Optimized queries for different use cases
+- Better scalability for read-heavy workloads
+- Clear audit trail of changes
+
+### Why SQLAlchemy?
+
+- Mature and well-documented ORM
+- Supports multiple databases
+- Migration support via Alembic
+- Type-safe with modern Python
+
+## Adding New Features
+
+### 1. Add New Entity
+
+```bash
+telemetryflow-restapi entity -n Product -f 'name:string,price:float,stock:int'
+```
+
+This generates:
+- Domain entity and repository interface
+- CQRS commands, queries, and handlers
+- Infrastructure repository implementation
+- HTTP handler with CRUD endpoints
+- Database migration
+
+### 2. Register Routes
+
+Add to `infrastructure/http/routes.py`:
+
+```python
+from ${module_name}.infrastructure.http.handlers.product_handler import product_bp
+
+app.register_blueprint(product_bp, url_prefix="/api/v1")
+```
+
+### 3. Run Migration
+
+```bash
+make migrate
+```
+
+## Testing Strategy
+
+- **Unit Tests**: Test handlers and domain logic in isolation
+- **Integration Tests**: Test with real database
+- **E2E Tests**: Test HTTP endpoints
+
+---
+
+*Generated by TelemetryFlow RESTful API Generator*

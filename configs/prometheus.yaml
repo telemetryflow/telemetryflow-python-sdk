@@ -1,0 +1,50 @@
+# =============================================================================
+# Prometheus Configuration
+# =============================================================================
+#
+# TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
+# Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+#
+# This configuration is for local development and testing.
+#
+# =============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+  external_labels:
+    monitor: 'telemetryflow-python-sdk'
+    environment: 'development'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files: []
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # OpenTelemetry Collector metrics
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8888']
+    metrics_path: /metrics
+
+  # OpenTelemetry Collector Prometheus exporter
+  - job_name: 'otel-collector-prometheus'
+    static_configs:
+      - targets: ['otel-collector:8889']
+    metrics_path: /metrics
+
+  # Python SDK application metrics (if running Flask/FastAPI example)
+  - job_name: 'python-sdk-app'
+    static_configs:
+      - targets: ['flask-app:5000']
+    metrics_path: /metrics
+    scrape_interval: 10s

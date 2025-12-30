@@ -1,0 +1,59 @@
+# =============================================================================
+# OpenTelemetry Collector Configuration - E2E Testing
+# =============================================================================
+#
+# TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
+# Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+#
+# Simplified configuration for E2E testing.
+#
+# =============================================================================
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 512
+
+exporters:
+  debug:
+    verbosity: detailed
+
+  logging:
+    verbosity: detailed
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+service:
+  extensions: [health_check]
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, logging]
+
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, logging]
+
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, logging]
+
+  telemetry:
+    logs:
+      level: debug
+    metrics:
+      address: 0.0.0.0:8888

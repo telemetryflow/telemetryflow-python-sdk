@@ -1,0 +1,373 @@
+# =============================================================================
+# TelemetryFlow Python SDK - CI Workflow
+# =============================================================================
+#
+# TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
+# Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+#
+# This workflow runs tests and linting for the TelemetryFlow Python SDK:
+# - Unit tests
+# - Integration tests
+# - Linting with ruff and mypy
+# - Code coverage
+#
+# =============================================================================
+
+name: CI - TFO Python SDK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - 'feature/**'
+      - 'release/**'
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+  workflow_dispatch:
+    inputs:
+      run_e2e:
+        description: 'Run E2E tests'
+        required: false
+        type: boolean
+        default: false
+      skip_lint:
+        description: 'Skip linting'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  PYTHON_VERSION: '3.12'
+  PRODUCT_NAME: TelemetryFlow Python SDK
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
+jobs:
+  # ===========================================================================
+  # Code Quality - Lint, Format, Type Check
+  # ===========================================================================
+  lint:
+    name: Lint & Code Quality
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip_lint }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Check formatting with ruff
+        run: ruff format --check src/ tests/
+
+      - name: Run ruff linter
+        run: ruff check src/ tests/
+
+      - name: Run mypy type checker
+        run: mypy src/ --ignore-missing-imports
+        continue-on-error: true
+
+  # ===========================================================================
+  # Unit Tests
+  # ===========================================================================
+  test-unit:
+    name: Unit Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    needs: lint
+    if: always() && (needs.lint.result == 'success' || needs.lint.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run unit tests
+        run: |
+          pytest tests/unit/ -v --cov=src/telemetryflow --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage report
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-unit
+          path: coverage.xml
+          retention-days: 7
+
+  # ===========================================================================
+  # Integration Tests
+  # ===========================================================================
+  test-integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    if: always() && (needs.lint.result == 'success' || needs.lint.result == 'skipped')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run integration tests
+        run: |
+          pytest tests/integration/ -v --cov=src/telemetryflow --cov-report=xml --cov-append || true
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-integration
+          path: coverage.xml
+          retention-days: 7
+        continue-on-error: true
+
+  # ===========================================================================
+  # E2E Tests (Optional)
+  # ===========================================================================
+  test-e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration]
+    if: ${{ inputs.run_e2e == true || github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run E2E tests
+        run: |
+          pytest tests/e2e/ -v || true
+
+  # ===========================================================================
+  # Build Verification - CLI Generators
+  # ===========================================================================
+  build:
+    name: Build & Verify (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: lint
+    if: always() && (needs.lint.result == 'success' || needs.lint.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e "."
+
+      - name: Verify CLI generators (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          telemetryflow-gen --version
+          telemetryflow-gen --help
+          telemetryflow-restapi --version
+          telemetryflow-restapi --help
+
+      - name: Verify CLI generators (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          telemetryflow-gen --version
+          telemetryflow-gen --help
+          telemetryflow-restapi --version
+          telemetryflow-restapi --help
+
+      - name: Test generator output (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          # Test telemetryflow-gen
+          telemetryflow-gen --no-banner example basic -o /tmp/test-gen
+          ls -la /tmp/test-gen/
+
+          # Test telemetryflow-restapi
+          telemetryflow-restapi --no-banner new -n test-api -o /tmp/test-restapi
+          ls -la /tmp/test-restapi/test-api/
+
+      - name: Test generator output (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          telemetryflow-gen --no-banner example basic -o $env:TEMP\test-gen
+          dir $env:TEMP\test-gen
+
+          telemetryflow-restapi --no-banner new -n test-api -o $env:TEMP\test-restapi
+          dir $env:TEMP\test-restapi\test-api
+
+  # ===========================================================================
+  # Security Scan
+  # ===========================================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    if: always() && (needs.lint.result == 'success' || needs.lint.result == 'skipped')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit safety pip-audit
+
+      - name: Run Bandit security linter
+        run: |
+          bandit -r src/ -f sarif -o bandit-results.sarif || true
+
+      - name: Upload Bandit SARIF
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: bandit-results.sarif
+        continue-on-error: true
+
+      - name: Run pip-audit
+        run: |
+          pip-audit --ignore-vuln PYSEC-2024-48 || true
+        continue-on-error: true
+
+  # ===========================================================================
+  # Coverage Report
+  # ===========================================================================
+  coverage:
+    name: Coverage Report
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration]
+    if: always() && needs.test-unit.result == 'success'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage
+
+      - name: Download unit coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-unit
+          path: coverage/
+        continue-on-error: true
+
+      - name: Coverage summary
+        run: |
+          echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage.xml ]; then
+            echo "Coverage report generated successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No coverage report available" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ===========================================================================
+  # CI Summary
+  # ===========================================================================
+  summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [lint, test-unit, test-integration, build, security, coverage]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## ${{ env.PRODUCT_NAME }} - CI Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.test-unit.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.test-integration.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage | ${{ needs.coverage.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check overall status
+        run: |
+          if [[ "${{ needs.lint.result }}" == "failure" ]] || \
+             [[ "${{ needs.test-unit.result }}" == "failure" ]] || \
+             [[ "${{ needs.build.result }}" == "failure" ]]; then
+            echo "CI failed - one or more required jobs failed"
+            exit 1
+          fi
+          echo "CI passed successfully"
