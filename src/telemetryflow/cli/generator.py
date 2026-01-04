@@ -35,11 +35,18 @@ class TemplateData:
         environment: str = "production",
         api_key_id: str = "",
         api_key_secret: str = "",
-        endpoint: str = "api.telemetryflow.id:4317",
+        endpoint: str = "localhost:4317",
         enable_metrics: bool = True,
         enable_logs: bool = True,
         enable_traces: bool = True,
         port: str = "8080",
+        # TFO v2 API settings (aligned with TFO-Collector v1.1.2)
+        use_v2_api: bool = True,
+        v2_only: bool = False,
+        collector_name: str = "TelemetryFlow Python SDK",
+        datacenter: str = "default",
+        enrich_resources: bool = True,
+        protocol: str = "grpc",
     ) -> None:
         self.project_name = project_name
         self.service_name = service_name or project_name
@@ -52,6 +59,13 @@ class TemplateData:
         self.enable_logs = enable_logs
         self.enable_traces = enable_traces
         self.port = port
+        # TFO v2 API fields
+        self.use_v2_api = use_v2_api
+        self.v2_only = v2_only
+        self.collector_name = collector_name
+        self.datacenter = datacenter
+        self.enrich_resources = enrich_resources
+        self.protocol = protocol
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for template substitution."""
@@ -67,6 +81,15 @@ class TemplateData:
             "enable_logs": str(self.enable_logs).lower(),
             "enable_traces": str(self.enable_traces).lower(),
             "port": self.port,
+            # TFO v2 API fields
+            "use_v2_api": str(self.use_v2_api).lower(),
+            "v2_only": str(self.v2_only).lower(),
+            "collector_name": self.collector_name,
+            "datacenter": self.datacenter,
+            "enrich_resources": str(self.enrich_resources).lower(),
+            "protocol": self.protocol,
+            "sdk_version": __version__,
+            "tfo_collector_version": "1.1.2",
         }
 
 
@@ -276,10 +299,16 @@ def cmd_init(args: argparse.Namespace) -> int:
         environment=args.environment or "production",
         api_key_id=args.key_id or "",
         api_key_secret=args.key_secret or "",
-        endpoint=args.endpoint or "api.telemetryflow.id:4317",
+        endpoint=args.endpoint or "localhost:4317",
         enable_metrics=not args.no_metrics,
         enable_logs=not args.no_logs,
         enable_traces=not args.no_traces,
+        # TFO v2 API settings
+        use_v2_api=getattr(args, "use_v2_api", True),
+        v2_only=getattr(args, "v2_only", False),
+        collector_name=getattr(args, "collector_name", None) or "TelemetryFlow Python SDK",
+        datacenter=getattr(args, "datacenter", None) or "default",
+        protocol=getattr(args, "protocol", None) or "grpc",
     )
 
     print(f"Initializing TelemetryFlow integration for project: {data.project_name}")
@@ -331,7 +360,13 @@ def cmd_config(args: argparse.Namespace) -> int:
         environment=args.environment or "production",
         api_key_id=args.key_id or "",
         api_key_secret=args.key_secret or "",
-        endpoint=args.endpoint or "api.telemetryflow.id:4317",
+        endpoint=args.endpoint or "localhost:4317",
+        # TFO v2 API settings
+        use_v2_api=getattr(args, "use_v2_api", True),
+        v2_only=getattr(args, "v2_only", False),
+        collector_name=getattr(args, "collector_name", None) or "TelemetryFlow Python SDK",
+        datacenter=getattr(args, "datacenter", None) or "default",
+        protocol=getattr(args, "protocol", None) or "grpc",
     )
 
     generate_config_file(output_dir, data, args.force, template_dir)
@@ -391,7 +426,7 @@ def main(argv: list[str] | None = None) -> int:
         "-e",
         "--endpoint",
         help="OTLP endpoint",
-        default="api.telemetryflow.id:4317",
+        default="localhost:4317",
     )
     init_parser.add_argument(
         "--environment",
@@ -404,6 +439,37 @@ def main(argv: list[str] | None = None) -> int:
     init_parser.add_argument("--no-logs", action="store_true", help="Disable logs")
     init_parser.add_argument("--no-traces", action="store_true", help="Disable traces")
     init_parser.add_argument("--template-dir", help="Custom template directory")
+    # TFO v2 API options
+    init_parser.add_argument(
+        "--use-v2-api",
+        dest="use_v2_api",
+        action="store_true",
+        default=True,
+        help="Enable TFO v2 API endpoints (default: true)",
+    )
+    init_parser.add_argument(
+        "--v2-only",
+        dest="v2_only",
+        action="store_true",
+        default=False,
+        help="Enable v2-only mode (disables v1 endpoints)",
+    )
+    init_parser.add_argument(
+        "--collector-name",
+        help="Collector name for identity",
+        default="TelemetryFlow Python SDK",
+    )
+    init_parser.add_argument(
+        "--datacenter",
+        help="Datacenter/region identifier",
+        default="default",
+    )
+    init_parser.add_argument(
+        "--protocol",
+        choices=["grpc", "http"],
+        help="Protocol (grpc or http)",
+        default="grpc",
+    )
 
     # ===== example command =====
     example_parser = subparsers.add_parser(
@@ -431,11 +497,33 @@ def main(argv: list[str] | None = None) -> int:
     config_parser.add_argument("--version", dest="version", help="Service version", default="1.0.0")
     config_parser.add_argument("-k", "--key-id", help="TelemetryFlow API Key ID")
     config_parser.add_argument("-s", "--key-secret", help="TelemetryFlow API Key Secret")
-    config_parser.add_argument("-e", "--endpoint", help="OTLP endpoint", default="api.telemetryflow.id:4317")
+    config_parser.add_argument("-e", "--endpoint", help="OTLP endpoint", default="localhost:4317")
     config_parser.add_argument("--environment", help="Environment", default="production")
     config_parser.add_argument("-o", "--output", help="Output directory")
     config_parser.add_argument("-f", "--force", action="store_true", help="Overwrite existing files")
     config_parser.add_argument("--template-dir", help="Custom template directory")
+    # TFO v2 API options
+    config_parser.add_argument(
+        "--use-v2-api",
+        dest="use_v2_api",
+        action="store_true",
+        default=True,
+        help="Enable TFO v2 API endpoints",
+    )
+    config_parser.add_argument(
+        "--v2-only",
+        dest="v2_only",
+        action="store_true",
+        default=False,
+        help="Enable v2-only mode",
+    )
+    config_parser.add_argument(
+        "--collector-name",
+        help="Collector name for identity",
+        default="TelemetryFlow Python SDK",
+    )
+    config_parser.add_argument("--datacenter", help="Datacenter/region", default="default")
+    config_parser.add_argument("--protocol", choices=["grpc", "http"], default="grpc")
 
     # ===== version command =====
     subparsers.add_parser("version", help="Show version information")

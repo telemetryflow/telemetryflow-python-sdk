@@ -31,10 +31,17 @@ class TestTemplateData:
         assert data.service_name == "test-service"
         assert data.service_version == "1.0.0"
         assert data.environment == "production"
-        assert data.endpoint == "api.telemetryflow.id:4317"
+        assert data.endpoint == "localhost:4317"
         assert data.enable_metrics is True
         assert data.enable_logs is True
         assert data.enable_traces is True
+        # TFO v2 API defaults
+        assert data.use_v2_api is True
+        assert data.v2_only is False
+        assert data.collector_name == "TelemetryFlow Python SDK"
+        assert data.datacenter == "default"
+        assert data.enrich_resources is True
+        assert data.protocol == "grpc"
 
     def test_template_data_custom_values(self) -> None:
         """Test creating template data with custom values."""
@@ -44,7 +51,7 @@ class TestTemplateData:
             service_name="custom-service",
             service_version="2.0.0",
             environment="staging",
-            endpoint="localhost:4317",
+            endpoint="custom.endpoint:4317",
             enable_metrics=False,
             enable_logs=True,
             enable_traces=False,
@@ -52,9 +59,30 @@ class TestTemplateData:
 
         assert data.service_version == "2.0.0"
         assert data.environment == "staging"
-        assert data.endpoint == "localhost:4317"
+        assert data.endpoint == "custom.endpoint:4317"
         assert data.enable_metrics is False
         assert data.enable_traces is False
+
+    def test_template_data_v2_api_settings(self) -> None:
+        """Test TFO v2 API configuration settings."""
+        data = TemplateData(
+            api_key_id="tfk_v2",
+            api_key_secret="tfs_v2",
+            service_name="v2-service",
+            use_v2_api=True,
+            v2_only=True,
+            collector_name="My Custom Collector",
+            datacenter="us-east-1",
+            enrich_resources=False,
+            protocol="http",
+        )
+
+        assert data.use_v2_api is True
+        assert data.v2_only is True
+        assert data.collector_name == "My Custom Collector"
+        assert data.datacenter == "us-east-1"
+        assert data.enrich_resources is False
+        assert data.protocol == "http"
 
     def test_template_data_to_dict(self) -> None:
         """Test converting template data to dictionary."""
@@ -71,6 +99,15 @@ class TestTemplateData:
         # Check that boolean values are converted to strings
         assert result["enable_metrics"] == "true"
         assert result["enable_logs"] == "true"
+        # TFO v2 API fields in dict
+        assert result["use_v2_api"] == "true"
+        assert result["v2_only"] == "false"
+        assert result["collector_name"] == "TelemetryFlow Python SDK"
+        assert result["datacenter"] == "default"
+        assert result["enrich_resources"] == "true"
+        assert result["protocol"] == "grpc"
+        assert "sdk_version" in result
+        assert result["tfo_collector_version"] == "1.1.2"
 
     def test_template_data_service_name_defaults_to_project(self) -> None:
         """Test that service_name defaults to project_name."""
@@ -97,6 +134,12 @@ class TestTemplateLoading:
         assert "TELEMETRYFLOW_API_KEY_ID" in content
         assert "TELEMETRYFLOW_SERVICE_NAME" in content
         assert "${api_key_id}" in content
+        # TFO v2 API fields
+        assert "TELEMETRYFLOW_USE_V2_API" in content
+        assert "TELEMETRYFLOW_V2_ONLY" in content
+        assert "TELEMETRYFLOW_COLLECTOR_NAME" in content
+        assert "TELEMETRYFLOW_DATACENTER" in content
+        assert "TELEMETRYFLOW_PROTOCOL" in content
 
     def test_load_template_init(self) -> None:
         """Test loading init.py.tpl template."""
@@ -105,6 +148,10 @@ class TestTemplateLoading:
         assert "TelemetryFlow" in content
         assert "def init(" in content
         assert "def get_client(" in content
+        # TFO v2 API support
+        assert "def init_v2_only(" in content
+        assert "use_v2_api" in content
+        assert "v2_only" in content
 
     def test_load_template_metrics(self) -> None:
         """Test loading metrics.py.tpl template."""
@@ -136,6 +183,10 @@ class TestTemplateLoading:
 
         assert "TelemetryFlow" in content
         assert "${project_name}" in content
+        # TFO v2 API documentation
+        assert "TFO v2 API" in content
+        assert "init_v2_only" in content
+        assert "/v2/traces" in content
 
     def test_load_template_not_found(self) -> None:
         """Test loading non-existent template raises error."""
@@ -317,6 +368,35 @@ class TestCLI:
             env_content = (Path(tmpdir) / ".env.telemetryflow").read_text()
             assert "tfk_config" in env_content
             assert "config-service" in env_content
+            # TFO v2 API fields should be in generated config
+            assert "TELEMETRYFLOW_USE_V2_API" in env_content
+            assert "TELEMETRYFLOW_V2_ONLY" in env_content
+
+    def test_cli_init_with_v2_options(self) -> None:
+        """Test CLI init command with TFO v2 API options."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = main([
+                "--no-banner",
+                "init",
+                "-k", "tfk_v2test",
+                "-s", "tfs_v2test",
+                "-n", "v2-test-service",
+                "-o", tmpdir,
+                "--v2-only",
+                "--collector-name", "My V2 Collector",
+                "--datacenter", "us-west-2",
+                "--protocol", "http",
+            ])
+
+            assert result == 0
+
+            # Check env file contains v2 API settings
+            env_content = (Path(tmpdir) / ".env.telemetryflow").read_text()
+            assert "TELEMETRYFLOW_USE_V2_API=true" in env_content
+            assert "TELEMETRYFLOW_V2_ONLY=true" in env_content
+            assert "My V2 Collector" in env_content
+            assert "us-west-2" in env_content
+            assert "http" in env_content
 
 
 class TestExampleTemplates:
@@ -328,6 +408,9 @@ class TestExampleTemplates:
 
         assert "init()" in content
         assert "get_client()" in content
+        # TFO v2 API support
+        assert "init_v2_only" in content
+        assert "TFO v2 API" in content
 
     def test_example_http_server_template(self) -> None:
         """Test loading HTTP server example template."""

@@ -39,15 +39,49 @@ class TelemetryFlowBuilder:
         ... )
     """
 
-    # Environment variable names
+    # Environment variable names - Core Settings
     ENV_API_KEY_ID = "TELEMETRYFLOW_API_KEY_ID"
     ENV_API_KEY_SECRET = "TELEMETRYFLOW_API_KEY_SECRET"
     ENV_ENDPOINT = "TELEMETRYFLOW_ENDPOINT"
     ENV_SERVICE_NAME = "TELEMETRYFLOW_SERVICE_NAME"
     ENV_SERVICE_VERSION = "TELEMETRYFLOW_SERVICE_VERSION"
     ENV_SERVICE_NAMESPACE = "TELEMETRYFLOW_SERVICE_NAMESPACE"
-    ENV_COLLECTOR_ID = "TELEMETRYFLOW_COLLECTOR_ID"
     ENV_ENVIRONMENT = "TELEMETRYFLOW_ENVIRONMENT"
+    ENV_INSECURE = "TELEMETRYFLOW_INSECURE"
+
+    # Environment variable names - TFO v2 API Settings
+    ENV_USE_V2_API = "TELEMETRYFLOW_USE_V2_API"
+    ENV_V2_ONLY = "TELEMETRYFLOW_V2_ONLY"
+
+    # Environment variable names - Collector Identity
+    ENV_COLLECTOR_ID = "TELEMETRYFLOW_COLLECTOR_ID"
+    ENV_COLLECTOR_NAME = "TELEMETRYFLOW_COLLECTOR_NAME"
+    ENV_COLLECTOR_HOSTNAME = "TELEMETRYFLOW_COLLECTOR_HOSTNAME"
+    ENV_DATACENTER = "TELEMETRYFLOW_DATACENTER"
+    ENV_ENRICH_RESOURCES = "TELEMETRYFLOW_ENRICH_RESOURCES"
+
+    # Environment variable names - Protocol Settings
+    ENV_PROTOCOL = "TELEMETRYFLOW_PROTOCOL"
+    ENV_COMPRESSION = "TELEMETRYFLOW_COMPRESSION"
+    ENV_TIMEOUT = "TELEMETRYFLOW_TIMEOUT"
+
+    # Environment variable names - Retry Settings
+    ENV_RETRY_ENABLED = "TELEMETRYFLOW_RETRY_ENABLED"
+    ENV_MAX_RETRIES = "TELEMETRYFLOW_MAX_RETRIES"
+    ENV_RETRY_BACKOFF = "TELEMETRYFLOW_RETRY_BACKOFF"
+
+    # Environment variable names - Batch Settings
+    ENV_BATCH_TIMEOUT = "TELEMETRYFLOW_BATCH_TIMEOUT"
+    ENV_BATCH_MAX_SIZE = "TELEMETRYFLOW_BATCH_MAX_SIZE"
+
+    # Environment variable names - Signals
+    ENV_ENABLE_TRACES = "TELEMETRYFLOW_ENABLE_TRACES"
+    ENV_ENABLE_METRICS = "TELEMETRYFLOW_ENABLE_METRICS"
+    ENV_ENABLE_LOGS = "TELEMETRYFLOW_ENABLE_LOGS"
+    ENV_ENABLE_EXEMPLARS = "TELEMETRYFLOW_ENABLE_EXEMPLARS"
+
+    # Environment variable names - Rate Limiting
+    ENV_RATE_LIMIT = "TELEMETRYFLOW_RATE_LIMIT"
 
     # Default values
     DEFAULT_ENDPOINT = "api.telemetryflow.id:4317"
@@ -479,19 +513,94 @@ class TelemetryFlowBuilder:
         """
         Load all configuration from environment variables.
 
-        This is a convenience method that calls all *_from_env methods.
+        This is a convenience method that loads all supported TELEMETRYFLOW_*
+        environment variables for TFO-Collector v1.1.2 compatibility.
 
         Returns:
             Self for method chaining
         """
-        return (
-            self.with_api_key_from_env()
-            .with_endpoint_from_env()
-            .with_service_from_env()
-            .with_service_namespace_from_env()
-            .with_environment_from_env()
-            .with_collector_id_from_env()
-        )
+        # Core settings
+        self.with_api_key_from_env()
+        self.with_endpoint_from_env()
+        self.with_service_from_env()
+        self.with_service_namespace_from_env()
+        self.with_environment_from_env()
+        self.with_collector_id_from_env()
+
+        # Insecure mode
+        insecure_str = os.environ.get(self.ENV_INSECURE, "false")
+        self._insecure = insecure_str.lower() == "true"
+
+        # Protocol settings
+        protocol_str = os.environ.get(self.ENV_PROTOCOL, "grpc")
+        if protocol_str.lower() == "http":
+            self._protocol = Protocol.HTTP
+        else:
+            self._protocol = Protocol.GRPC
+
+        # Compression
+        compression_str = os.environ.get(self.ENV_COMPRESSION, "false")
+        self._compression = compression_str.lower() == "true"
+
+        # Timeout (in seconds)
+        timeout_str = os.environ.get(self.ENV_TIMEOUT, "10")
+        try:
+            self._timeout = timedelta(seconds=int(timeout_str))
+        except ValueError:
+            pass
+
+        # Retry settings
+        retry_enabled_str = os.environ.get(self.ENV_RETRY_ENABLED, "true")
+        self._retry_enabled = retry_enabled_str.lower() == "true"
+
+        max_retries_str = os.environ.get(self.ENV_MAX_RETRIES, "3")
+        try:
+            self._max_retries = int(max_retries_str)
+        except ValueError:
+            pass
+
+        retry_backoff_str = os.environ.get(self.ENV_RETRY_BACKOFF, "500")
+        try:
+            self._retry_backoff = timedelta(milliseconds=int(retry_backoff_str))
+        except ValueError:
+            pass
+
+        # Batch settings
+        batch_timeout_str = os.environ.get(self.ENV_BATCH_TIMEOUT, "5000")
+        try:
+            self._batch_timeout = timedelta(milliseconds=int(batch_timeout_str))
+        except ValueError:
+            pass
+
+        batch_max_size_str = os.environ.get(self.ENV_BATCH_MAX_SIZE, "512")
+        try:
+            self._batch_max_size = int(batch_max_size_str)
+        except ValueError:
+            pass
+
+        # Signal settings
+        enable_traces_str = os.environ.get(self.ENV_ENABLE_TRACES, "true")
+        self._enable_traces = enable_traces_str.lower() == "true"
+
+        enable_metrics_str = os.environ.get(self.ENV_ENABLE_METRICS, "true")
+        self._enable_metrics = enable_metrics_str.lower() == "true"
+
+        enable_logs_str = os.environ.get(self.ENV_ENABLE_LOGS, "true")
+        self._enable_logs = enable_logs_str.lower() == "true"
+
+        enable_exemplars_str = os.environ.get(self.ENV_ENABLE_EXEMPLARS, "true")
+        self._exemplars_enabled = enable_exemplars_str.lower() == "true"
+
+        # Rate limit (0 = unlimited)
+        rate_limit_str = os.environ.get(self.ENV_RATE_LIMIT, "0")
+        try:
+            rate_limit = int(rate_limit_str)
+            if rate_limit > 0:
+                self._rate_limit = rate_limit
+        except ValueError:
+            pass
+
+        return self
 
     # Build Methods
 

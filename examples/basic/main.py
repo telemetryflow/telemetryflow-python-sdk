@@ -1,10 +1,15 @@
 """Basic TelemetryFlow SDK usage example.
 
+TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
+Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+
 This example demonstrates the core functionality of the TelemetryFlow SDK:
-- Client initialization and shutdown
+- Client initialization with TFO v2 API support
 - Recording metrics (counters, gauges, histograms)
 - Emitting logs (info, warn, error)
 - Creating trace spans with events
+
+Compatible with TFO-Collector v1.1.2 (OCB-native)
 
 Usage:
     export TELEMETRYFLOW_API_KEY_ID=tfk_your_key_id
@@ -20,14 +25,15 @@ from telemetryflow.application.commands import SpanKind
 
 
 def main() -> None:
-    """Main function demonstrating SDK usage."""
+    """Main function demonstrating SDK usage with TFO v2 API."""
     # Create the client using the builder pattern
     # with_auto_configuration() loads settings from environment variables
+    # TFO v2 API is enabled by default
     client = TelemetryFlowBuilder().with_auto_configuration().build()
 
     # Initialize the SDK - this connects to the TelemetryFlow backend
     client.initialize()
-    print("TelemetryFlow SDK initialized!")
+    print("TelemetryFlow SDK initialized with TFO v2 API!")
     print(f"Client status: {client.get_status()}")
 
     try:
@@ -65,10 +71,14 @@ def main() -> None:
         # ============================================
         print("\n--- Emitting Logs ---")
 
-        # Info level log
+        # Info level log with TFO v2 API metadata
         client.log_info(
             "Application started successfully",
-            {"version": "1.0.0", "environment": "development"},
+            {
+                "version": "1.0.0",
+                "environment": "development",
+                "tfo_api_version": "v2",
+            },
         )
         print("Logged: INFO - Application started")
 
@@ -123,6 +133,13 @@ def main() -> None:
         with client.span("process_request", SpanKind.SERVER) as request_span:
             print(f"Processing request (span: {request_span})")
             time.sleep(0.05)
+
+            # Add TFO v2 API context to span events
+            client.add_span_event(
+                request_span,
+                "request_received",
+                {"tfo_api_version": "v2", "endpoint": "/api/users"},
+            )
 
             # Nested span for database operation
             with client.span("database_query", SpanKind.CLIENT) as db_span:

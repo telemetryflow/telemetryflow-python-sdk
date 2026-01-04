@@ -1,0 +1,157 @@
+# =============================================================================
+# TelemetryFlow Python SDK - TFO v2-Only Configuration
+# =============================================================================
+# This configuration enables TFO v2-only mode for maximum TelemetryFlow Platform
+# integration. All telemetry is sent via v2 endpoints with full authentication.
+#
+# Compatible with TFO-Collector v1.1.2 (OCB-native) in v2_only mode
+#
+# Usage in Python:
+#   from telemetryflow import TelemetryFlowBuilder
+#
+#   client = TelemetryFlowBuilder() \
+#       .with_config_file("configs/sdk-v2-only.yaml") \
+#       .build()
+#
+# Or programmatically:
+#   client = TelemetryFlowBuilder() \
+#       .with_api_key("tfk_xxx", "tfs_xxx") \
+#       .with_endpoint("localhost:4317") \
+#       .with_service("my-service", "1.0.0") \
+#       .with_v2_only() \
+#       .with_collector_name("My App Collector") \
+#       .build()
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SDK Version Info
+# -----------------------------------------------------------------------------
+version: "1.1.2"
+tfo_collector_version: "1.1.2"
+otel_version: "1.28.0"
+
+# -----------------------------------------------------------------------------
+# Service Configuration
+# -----------------------------------------------------------------------------
+service:
+  name: "${TELEMETRYFLOW_SERVICE_NAME:my-python-service}"
+  version: "${TELEMETRYFLOW_SERVICE_VERSION:1.0.0}"
+  namespace: "${TELEMETRYFLOW_SERVICE_NAMESPACE:telemetryflow}"
+  environment: "${TELEMETRYFLOW_ENVIRONMENT:production}"
+
+# -----------------------------------------------------------------------------
+# TelemetryFlow API Authentication (REQUIRED for v2-only mode)
+# -----------------------------------------------------------------------------
+credentials:
+  key_id: "${TELEMETRYFLOW_API_KEY_ID}"
+  key_secret: "${TELEMETRYFLOW_API_KEY_SECRET}"
+
+# -----------------------------------------------------------------------------
+# Endpoint Configuration
+# -----------------------------------------------------------------------------
+endpoint:
+  address: "${TELEMETRYFLOW_ENDPOINT:localhost:4317}"
+  protocol: "${TELEMETRYFLOW_PROTOCOL:grpc}"
+  insecure: ${TELEMETRYFLOW_INSECURE:false}
+  timeout: "30s"
+
+# -----------------------------------------------------------------------------
+# TFO v2 API Configuration - V2-ONLY MODE
+# -----------------------------------------------------------------------------
+# In v2-only mode:
+# - All telemetry uses v2 endpoints exclusively
+# - v1 endpoints are disabled
+# - Authentication is mandatory
+# - Enhanced headers are sent with all requests
+# -----------------------------------------------------------------------------
+v2_api:
+  enabled: true
+  v2_only: true
+  traces_endpoint: "/v2/traces"
+  metrics_endpoint: "/v2/metrics"
+  logs_endpoint: "/v2/logs"
+
+# -----------------------------------------------------------------------------
+# Collector Identity (REQUIRED for v2-only mode)
+# -----------------------------------------------------------------------------
+# In v2-only mode, collector identity is used for:
+# - Request authentication and authorization
+# - Telemetry correlation and grouping
+# - Resource enrichment and attribution
+# -----------------------------------------------------------------------------
+collector:
+  id: "${TELEMETRYFLOW_COLLECTOR_ID:}"
+  name: "${TELEMETRYFLOW_COLLECTOR_NAME:TelemetryFlow Python SDK v2}"
+  description: "TelemetryFlow Python SDK - TFO v2-only mode"
+  hostname: "${TELEMETRYFLOW_COLLECTOR_HOSTNAME:}"
+  datacenter: "${TELEMETRYFLOW_DATACENTER:default}"
+  enrich_resources: true
+  tags:
+    sdk_version: "1.1.2"
+    sdk_language: "python"
+    mode: "v2-only"
+
+# -----------------------------------------------------------------------------
+# Signal Configuration - All Enabled
+# -----------------------------------------------------------------------------
+signals:
+  traces:
+    enabled: true
+  metrics:
+    enabled: true
+    exemplars: true
+  logs:
+    enabled: true
+
+# -----------------------------------------------------------------------------
+# Batching Configuration - Optimized for Production
+# -----------------------------------------------------------------------------
+batch:
+  timeout: "5s"
+  max_size: 1024
+
+# -----------------------------------------------------------------------------
+# Retry Configuration - Production Settings
+# -----------------------------------------------------------------------------
+retry:
+  enabled: true
+  max_attempts: 5
+  initial_backoff: "1s"
+  max_backoff: "30s"
+
+# -----------------------------------------------------------------------------
+# Compression - Enabled for Production
+# -----------------------------------------------------------------------------
+compression:
+  enabled: true
+  algorithm: "gzip"
+
+# -----------------------------------------------------------------------------
+# Rate Limiting - Production Settings
+# -----------------------------------------------------------------------------
+rate_limit:
+  requests_per_second: 10000
+
+# -----------------------------------------------------------------------------
+# gRPC Configuration - Production Optimized
+# -----------------------------------------------------------------------------
+grpc:
+  keepalive:
+    time: "30s"
+    timeout: "10s"
+    permit_without_stream: true
+  max_message_size: 16777216  # 16 MiB
+
+# -----------------------------------------------------------------------------
+# HTTP Configuration - Production Optimized
+# -----------------------------------------------------------------------------
+http:
+  max_idle_conns: 200
+  idle_conn_timeout: "120s"
+
+# -----------------------------------------------------------------------------
+# Custom Resource Attributes for v2-only Mode
+# -----------------------------------------------------------------------------
+resource_attributes:
+  telemetryflow.api.version: "v2"
+  telemetryflow.mode: "v2-only"
