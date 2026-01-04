@@ -12,9 +12,9 @@ from opentelemetry.exporter.otlp.proto.http.metric_exporter import (
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import (
     OTLPSpanExporter as HTTPSpanExporter,
 )
+from opentelemetry.sdk.metrics.export import MetricExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace.export import SpanExporter
-from opentelemetry.sdk.metrics.export import MetricExporter
 
 if TYPE_CHECKING:
     from telemetryflow.domain.config import TelemetryConfig
@@ -43,6 +43,17 @@ class OTLPExporterFactory:
         headers = self._config.get_auth_headers()
         headers["Content-Type"] = "application/x-protobuf"
         return headers
+
+    def _get_grpc_headers(self) -> tuple[tuple[str, str], ...]:
+        """
+        Get headers formatted for gRPC metadata.
+
+        gRPC requires metadata keys to be lowercase.
+
+        Returns:
+            Tuple of (key, value) pairs with lowercase keys
+        """
+        return tuple((k.lower(), v) for k, v in self._headers.items())
 
     def create_resource(self) -> Resource:
         """
@@ -86,13 +97,14 @@ class OTLPExporterFactory:
         """Create a gRPC trace exporter."""
         kwargs: dict[str, Any] = {
             "endpoint": self._config.endpoint,
-            "headers": tuple(self._headers.items()),
+            "headers": self._get_grpc_headers(),
             "insecure": self._config.insecure,
             "timeout": int(self._config.timeout.total_seconds()),
         }
 
         if self._config.compression:
             from opentelemetry.exporter.otlp.proto.grpc.exporter import Compression
+
             kwargs["compression"] = Compression.Gzip
 
         return OTLPSpanExporter(**kwargs)
@@ -109,6 +121,7 @@ class OTLPExporterFactory:
 
         if self._config.compression:
             from opentelemetry.exporter.otlp.proto.http.exporter import Compression
+
             kwargs["compression"] = Compression.Gzip
 
         return HTTPSpanExporter(**kwargs)
@@ -117,13 +130,14 @@ class OTLPExporterFactory:
         """Create a gRPC metric exporter."""
         kwargs: dict[str, Any] = {
             "endpoint": self._config.endpoint,
-            "headers": tuple(self._headers.items()),
+            "headers": self._get_grpc_headers(),
             "insecure": self._config.insecure,
             "timeout": int(self._config.timeout.total_seconds()),
         }
 
         if self._config.compression:
             from opentelemetry.exporter.otlp.proto.grpc.exporter import Compression
+
             kwargs["compression"] = Compression.Gzip
 
         return OTLPMetricExporter(**kwargs)
@@ -140,6 +154,7 @@ class OTLPExporterFactory:
 
         if self._config.compression:
             from opentelemetry.exporter.otlp.proto.http.exporter import Compression
+
             kwargs["compression"] = Compression.Gzip
 
         return HTTPMetricExporter(**kwargs)

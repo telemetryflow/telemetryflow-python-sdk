@@ -18,7 +18,6 @@ from typing import Any
 from telemetryflow.banner import print_banner
 from telemetryflow.version import __version__
 
-
 # =============================================================================
 # TEMPLATE DATA STRUCTURES
 # =============================================================================
@@ -374,7 +373,7 @@ def cmd_config(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_version(args: argparse.Namespace) -> int:
+def cmd_version(_args: argparse.Namespace) -> int:
     """Show version information."""
     from telemetryflow.version import info
 
@@ -483,8 +482,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Example type",
     )
     example_parser.add_argument("-o", "--output", help="Output directory")
-    example_parser.add_argument("-f", "--force", action="store_true", help="Overwrite existing files")
-    example_parser.add_argument("--port", help="Server port (for http-server example)", default="8080")
+    example_parser.add_argument(
+        "-f", "--force", action="store_true", help="Overwrite existing files"
+    )
+    example_parser.add_argument(
+        "--port", help="Server port (for http-server example)", default="8080"
+    )
     example_parser.add_argument("--template-dir", help="Custom template directory")
 
     # ===== config command =====
@@ -500,7 +503,9 @@ def main(argv: list[str] | None = None) -> int:
     config_parser.add_argument("-e", "--endpoint", help="OTLP endpoint", default="localhost:4317")
     config_parser.add_argument("--environment", help="Environment", default="production")
     config_parser.add_argument("-o", "--output", help="Output directory")
-    config_parser.add_argument("-f", "--force", action="store_true", help="Overwrite existing files")
+    config_parser.add_argument(
+        "-f", "--force", action="store_true", help="Overwrite existing files"
+    )
     config_parser.add_argument("--template-dir", help="Custom template directory")
     # TFO v2 API options
     config_parser.add_argument(

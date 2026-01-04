@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
@@ -33,10 +32,15 @@ class SpanKind(str, Enum):
 
 
 @dataclass
-class Command(ABC):
+class Command:
     """Base class for all commands."""
 
     timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+    @property
+    def command_type(self) -> str:
+        """Return the command type identifier."""
+        return self.__class__.__name__
 
 
 class CommandHandler(Protocol):

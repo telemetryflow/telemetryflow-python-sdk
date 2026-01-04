@@ -6,10 +6,12 @@
 # Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
 #
 # This workflow runs tests and linting for the TelemetryFlow Python SDK:
-# - Unit tests
-# - Integration tests
-# - Linting with ruff and mypy
-# - Code coverage
+# - Unit tests (via Makefile)
+# - Integration tests (via Makefile)
+# - Linting with ruff and mypy (via Makefile)
+# - Code coverage (via Makefile)
+#
+# Compatible with TFO-Collector v1.1.2 (OCB-native)
 #
 # =============================================================================
 
@@ -28,6 +30,7 @@ on:
       - 'tests/**'
       - 'pyproject.toml'
       - 'requirements*.txt'
+      - 'Makefile'
       - '.github/workflows/ci.yml'
   pull_request:
     branches:
@@ -39,6 +42,7 @@ on:
       - 'tests/**'
       - 'pyproject.toml'
       - 'requirements*.txt'
+      - 'Makefile'
   workflow_dispatch:
     inputs:
       run_e2e:
@@ -55,6 +59,8 @@ on:
 env:
   PYTHON_VERSION: '3.12'
   PRODUCT_NAME: TelemetryFlow Python SDK
+  VERSION: '1.1.2'
+  TFO_COLLECTOR_VERSION: '1.1.2'
 
 permissions:
   contents: read
@@ -63,7 +69,7 @@ permissions:
 
 jobs:
   # ===========================================================================
-  # Code Quality - Lint, Format, Type Check
+  # Code Quality - Lint, Format, Type Check (via Makefile)
   # ===========================================================================
   lint:
     name: Lint & Code Quality
@@ -79,23 +85,17 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+      - name: Install CI dependencies
+        run: make ci-deps
 
-      - name: Check formatting with ruff
-        run: ruff format --check src/ tests/
+      - name: Show version info
+        run: make version
 
-      - name: Run ruff linter
-        run: ruff check src/ tests/
-
-      - name: Run mypy type checker
-        run: mypy src/ --ignore-missing-imports
-        continue-on-error: true
+      - name: Run CI lint suite
+        run: make ci-lint
 
   # ===========================================================================
-  # Unit Tests
+  # Unit Tests (via Makefile)
   # ===========================================================================
   test-unit:
     name: Unit Tests (Python ${{ matrix.python-version }})
@@ -116,25 +116,24 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+      - name: Install CI dependencies
+        run: make ci-deps
 
-      - name: Run unit tests
-        run: |
-          pytest tests/unit/ -v --cov=src/telemetryflow --cov-report=xml --cov-report=term-missing
+      - name: Run unit tests (CI mode)
+        run: make ci-test-unit
 
       - name: Upload coverage report
         if: matrix.python-version == '3.12'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-unit
-          path: coverage.xml
+          path: |
+            coverage-unit.xml
+            junit-unit.xml
           retention-days: 7
 
   # ===========================================================================
-  # Integration Tests
+  # Integration Tests (via Makefile)
   # ===========================================================================
   test-integration:
     name: Integration Tests
@@ -151,20 +150,19 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+      - name: Install CI dependencies
+        run: make ci-deps
 
-      - name: Run integration tests
-        run: |
-          pytest tests/integration/ -v --cov=src/telemetryflow --cov-report=xml --cov-append || true
+      - name: Run integration tests (CI mode)
+        run: make ci-test-integration
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-integration
-          path: coverage.xml
+          path: |
+            coverage-integration.xml
+            junit-integration.xml
           retention-days: 7
         continue-on-error: true
 
@@ -186,17 +184,15 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+      - name: Install CI dependencies
+        run: make ci-deps
 
       - name: Run E2E tests
         run: |
           pytest tests/e2e/ -v || true
 
   # ===========================================================================
-  # Build Verification - CLI Generators
+  # Build Verification - CLI Generators (via Makefile)
   # ===========================================================================
   build:
     name: Build & Verify (${{ matrix.os }})
@@ -217,10 +213,19 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Install package
+      - name: Install package (Unix)
+        if: matrix.os != 'windows-latest'
+        run: make deps
+
+      - name: Install package (Windows)
+        if: matrix.os == 'windows-latest'
         run: |
           python -m pip install --upgrade pip
           pip install -e "."
+
+      - name: Show version info (Unix)
+        if: matrix.os != 'windows-latest'
+        run: make version
 
       - name: Verify CLI generators (Unix)
         if: matrix.os != 'windows-latest'
@@ -259,7 +264,7 @@ jobs:
           dir $env:TEMP\test-restapi\test-api
 
   # ===========================================================================
-  # Security Scan
+  # Security Scan (via Makefile)
   # ===========================================================================
   security:
     name: Security Scan
@@ -276,29 +281,21 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install bandit safety pip-audit
+      - name: Install CI dependencies
+        run: make ci-deps
 
-      - name: Run Bandit security linter
-        run: |
-          bandit -r src/ -f sarif -o bandit-results.sarif || true
+      - name: Run security scan (CI mode)
+        run: make ci-security
 
       - name: Upload Bandit SARIF
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: bandit-results.sarif
-        continue-on-error: true
-
-      - name: Run pip-audit
-        run: |
-          pip-audit --ignore-vuln PYSEC-2024-48 || true
+          sarif_file: bandit-results.json
         continue-on-error: true
 
   # ===========================================================================
-  # Coverage Report
+  # Coverage Report (via Makefile)
   # ===========================================================================
   coverage:
     name: Coverage Report
@@ -315,23 +312,30 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install coverage
+      - name: Install CI dependencies
+        run: make ci-deps
 
-      - name: Download unit coverage
-        uses: actions/download-artifact@v4
+      - name: Generate coverage report (CI mode)
+        run: make ci-coverage
+
+      - name: Upload HTML coverage report
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-unit
-          path: coverage/
+          name: coverage-html
+          path: htmlcov/
+          retention-days: 7
         continue-on-error: true
 
       - name: Coverage summary
         run: |
           echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
-          if [ -f coverage/coverage.xml ]; then
+          if [ -f coverage.xml ]; then
             echo "Coverage report generated successfully" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### TFO v2 API Features Tested:" >> $GITHUB_STEP_SUMMARY
+            echo "- v2 endpoints: /v2/traces, /v2/metrics, /v2/logs" >> $GITHUB_STEP_SUMMARY
+            echo "- Collector identity (tfoidentityextension)" >> $GITHUB_STEP_SUMMARY
+            echo "- Auth headers (tfoauthextension)" >> $GITHUB_STEP_SUMMARY
           else
             echo "No coverage report available" >> $GITHUB_STEP_SUMMARY
           fi
@@ -347,7 +351,9 @@ jobs:
     steps:
       - name: Generate summary
         run: |
-          echo "## ${{ env.PRODUCT_NAME }} - CI Results" >> $GITHUB_STEP_SUMMARY
+          echo "## ${{ env.PRODUCT_NAME }} v${{ env.VERSION }} - CI Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**TFO-Collector Version:** ${{ env.TFO_COLLECTOR_VERSION }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
@@ -357,6 +363,11 @@ jobs:
           echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Coverage | ${{ needs.coverage.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### TFO v2 API Features" >> $GITHUB_STEP_SUMMARY
+          echo "- v2 endpoints: /v2/traces, /v2/metrics, /v2/logs" >> $GITHUB_STEP_SUMMARY
+          echo "- Collector identity (aligned with tfoidentityextension)" >> $GITHUB_STEP_SUMMARY
+          echo "- Auth headers (aligned with tfoauthextension)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

@@ -3,6 +3,13 @@ TelemetryFlow Python SDK - OpenTelemetry-based observability SDK.
 
 This SDK provides a simple and intuitive interface for instrumenting your
 Python applications with metrics, logs, and traces using OpenTelemetry.
+
+Features:
+    - Automatic configuration from environment variables
+    - Support for traces, metrics, and logs
+    - Auto-instrumentation for popular frameworks (Flask, FastAPI, SQLAlchemy, etc.)
+    - CQRS-based architecture for clean separation of concerns
+    - Full OpenTelemetry compatibility
 """
 
 from telemetryflow.builder import TelemetryFlowBuilder
@@ -22,7 +29,13 @@ __all__ = [
     "SignalType",
     # Version
     "__version__",
+    # Convenience functions
+    "new_client",
+    "new_from_env",
+    "new_simple",
+    "auto_instrument",
 ]
+
 
 # Convenience constructors
 def new_client(config: TelemetryConfig) -> TelemetryFlowClient:
@@ -49,3 +62,32 @@ def new_simple(
         .with_service(service_name)
         .build()
     )
+
+
+def auto_instrument(
+    client: TelemetryFlowClient | None = None,
+    **kwargs: object,
+) -> dict[str, bool]:
+    """Auto-instrument all available libraries.
+
+    This function automatically instruments all supported libraries that are
+    installed in the environment. It's the easiest way to enable observability
+    for your application.
+
+    Args:
+        client: Optional TelemetryFlowClient to use for instrumentation
+        **kwargs: Additional arguments passed to setup_auto_instrumentation
+
+    Returns:
+        Dictionary mapping instrumentation names to success status
+
+    Example:
+        >>> from telemetryflow import TelemetryFlowBuilder, auto_instrument
+        >>> client = TelemetryFlowBuilder().with_auto_configuration().build()
+        >>> client.initialize()
+        >>> results = auto_instrument(client)
+        >>> print(f"Instrumented: {[k for k, v in results.items() if v]}")
+    """
+    from telemetryflow.instrumentation.integration import setup_auto_instrumentation
+
+    return setup_auto_instrumentation(client=client, **kwargs)

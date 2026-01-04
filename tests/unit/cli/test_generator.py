@@ -9,9 +9,9 @@ from telemetryflow.cli.generator import (
     TemplateData,
     get_template_dir,
     load_template,
+    main,
     render_template,
     render_template_file,
-    main,
 )
 
 
@@ -275,14 +275,20 @@ class TestCLI:
     def test_cli_init_creates_files(self) -> None:
         """Test CLI init command creates files."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = main([
-                "--no-banner",
-                "init",
-                "-k", "tfk_test",
-                "-s", "tfs_test",
-                "-n", "test-service",
-                "-o", tmpdir,
-            ])
+            result = main(
+                [
+                    "--no-banner",
+                    "init",
+                    "-k",
+                    "tfk_test",
+                    "-s",
+                    "tfs_test",
+                    "-n",
+                    "test-service",
+                    "-o",
+                    tmpdir,
+                ]
+            )
 
             assert result == 0
 
@@ -298,25 +304,37 @@ class TestCLI:
         """Test CLI init command with force flag."""
         with tempfile.TemporaryDirectory() as tmpdir:
             # Create initial files
-            main([
-                "--no-banner",
-                "init",
-                "-k", "tfk_first",
-                "-s", "tfs_first",
-                "-n", "first-service",
-                "-o", tmpdir,
-            ])
+            main(
+                [
+                    "--no-banner",
+                    "init",
+                    "-k",
+                    "tfk_first",
+                    "-s",
+                    "tfs_first",
+                    "-n",
+                    "first-service",
+                    "-o",
+                    tmpdir,
+                ]
+            )
 
             # Overwrite with force
-            result = main([
-                "--no-banner",
-                "init",
-                "-k", "tfk_second",
-                "-s", "tfs_second",
-                "-n", "second-service",
-                "-o", tmpdir,
-                "--force",
-            ])
+            result = main(
+                [
+                    "--no-banner",
+                    "init",
+                    "-k",
+                    "tfk_second",
+                    "-s",
+                    "tfs_second",
+                    "-n",
+                    "second-service",
+                    "-o",
+                    tmpdir,
+                    "--force",
+                ]
+            )
 
             assert result == 0
 
@@ -328,12 +346,15 @@ class TestCLI:
     def test_cli_example_basic(self) -> None:
         """Test CLI example command generates basic example."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = main([
-                "--no-banner",
-                "example",
-                "basic",
-                "-o", tmpdir,
-            ])
+            result = main(
+                [
+                    "--no-banner",
+                    "example",
+                    "basic",
+                    "-o",
+                    tmpdir,
+                ]
+            )
 
             assert result == 0
             assert (Path(tmpdir) / "example_basic.py").exists()
@@ -341,12 +362,15 @@ class TestCLI:
     def test_cli_example_http_server(self) -> None:
         """Test CLI example command generates HTTP server example."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = main([
-                "--no-banner",
-                "example",
-                "http-server",
-                "-o", tmpdir,
-            ])
+            result = main(
+                [
+                    "--no-banner",
+                    "example",
+                    "http-server",
+                    "-o",
+                    tmpdir,
+                ]
+            )
 
             assert result == 0
             assert (Path(tmpdir) / "example_http_server.py").exists()
@@ -354,14 +378,20 @@ class TestCLI:
     def test_cli_config_generates_env(self) -> None:
         """Test CLI config command generates .env file."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = main([
-                "--no-banner",
-                "config",
-                "-k", "tfk_config",
-                "-s", "tfs_config",
-                "-n", "config-service",
-                "-o", tmpdir,
-            ])
+            result = main(
+                [
+                    "--no-banner",
+                    "config",
+                    "-k",
+                    "tfk_config",
+                    "-s",
+                    "tfs_config",
+                    "-n",
+                    "config-service",
+                    "-o",
+                    tmpdir,
+                ]
+            )
 
             assert result == 0
 
@@ -375,18 +405,27 @@ class TestCLI:
     def test_cli_init_with_v2_options(self) -> None:
         """Test CLI init command with TFO v2 API options."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = main([
-                "--no-banner",
-                "init",
-                "-k", "tfk_v2test",
-                "-s", "tfs_v2test",
-                "-n", "v2-test-service",
-                "-o", tmpdir,
-                "--v2-only",
-                "--collector-name", "My V2 Collector",
-                "--datacenter", "us-west-2",
-                "--protocol", "http",
-            ])
+            result = main(
+                [
+                    "--no-banner",
+                    "init",
+                    "-k",
+                    "tfk_v2test",
+                    "-s",
+                    "tfs_v2test",
+                    "-n",
+                    "v2-test-service",
+                    "-o",
+                    tmpdir,
+                    "--v2-only",
+                    "--collector-name",
+                    "My V2 Collector",
+                    "--datacenter",
+                    "us-west-2",
+                    "--protocol",
+                    "http",
+                ]
+            )
 
             assert result == 0
 

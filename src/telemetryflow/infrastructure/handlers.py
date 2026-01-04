@@ -36,9 +36,9 @@ from telemetryflow.application.commands import (
 from telemetryflow.infrastructure.exporters import OTLPExporterFactory
 
 if TYPE_CHECKING:
+    from opentelemetry.metrics import Meter
     from opentelemetry.sdk.resources import Resource
     from opentelemetry.trace import Span, Tracer
-    from opentelemetry.metrics import Meter
 
     from telemetryflow.domain.config import TelemetryConfig
 
@@ -139,9 +139,7 @@ class TelemetryCommandHandler:
 
             self._initialized = True
             self._start_time = datetime.now(UTC)
-            logger.info(
-                f"TelemetryFlow SDK initialized for service '{self._config.service_name}'"
-            )
+            logger.info(f"TelemetryFlow SDK initialized for service '{self._config.service_name}'")
 
     def _init_tracer(self, resource: Resource) -> None:
         """Initialize the tracer provider."""
@@ -223,7 +221,7 @@ class TelemetryCommandHandler:
             if errors:
                 raise RuntimeError(f"Shutdown completed with {len(errors)} error(s)")
 
-    def _handle_flush(self, command: FlushTelemetryCommand) -> None:
+    def _handle_flush(self, _command: FlushTelemetryCommand) -> None:
         """Force flush all pending telemetry data."""
         if not self._initialized:
             return
@@ -399,9 +397,7 @@ class TelemetryCommandHandler:
                 result[key] = value
             elif isinstance(value, (list, tuple)):
                 # Ensure all items in sequence are valid types
-                result[key] = [
-                    v for v in value if isinstance(v, (str, bool, int, float))
-                ]
+                result[key] = [v for v in value if isinstance(v, (str, bool, int, float))]
             else:
                 # Convert other types to string
                 result[key] = str(value)

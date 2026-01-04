@@ -4,12 +4,7 @@ from datetime import timedelta
 
 import pytest
 
-from telemetryflow.domain.config import (
-    ConfigError,
-    Protocol,
-    SignalType,
-    TelemetryConfig,
-)
+from telemetryflow.domain.config import ConfigError, Protocol, SignalType, TelemetryConfig
 from telemetryflow.domain.credentials import Credentials
 
 
@@ -413,3 +408,201 @@ class TestSignalType:
         assert SignalType.METRICS.value == "metrics"
         assert SignalType.LOGS.value == "logs"
         assert SignalType.TRACES.value == "traces"
+
+
+class TestConfigValidation:
+    """Tests for configuration validation edge cases."""
+
+    def test_zero_rate_limit_raises_error(self, valid_credentials: Credentials) -> None:
+        """Test that zero rate limit raises ConfigError."""
+        with pytest.raises(ConfigError, match="Rate limit must be positive"):
+            TelemetryConfig(
+                credentials=valid_credentials,
+                endpoint="localhost:4317",
+                service_name="test-service",
+                rate_limit=0,
+            )
+
+    def test_negative_rate_limit_raises_error(self, valid_credentials: Credentials) -> None:
+        """Test that negative rate limit raises ConfigError."""
+        with pytest.raises(ConfigError, match="Rate limit must be positive"):
+            TelemetryConfig(
+                credentials=valid_credentials,
+                endpoint="localhost:4317",
+                service_name="test-service",
+                rate_limit=-100,
+            )
+
+    def test_multiple_validation_errors(self, valid_credentials: Credentials) -> None:
+        """Test that multiple validation errors are reported."""
+        with pytest.raises(ConfigError) as exc_info:
+            TelemetryConfig(
+                credentials=valid_credentials,
+                endpoint="",
+                service_name="",
+                timeout=timedelta(seconds=-1),
+            )
+
+        error_message = str(exc_info.value)
+        assert "Endpoint is required" in error_message
+        assert "Service name is required" in error_message
+
+
+class TestFluentMethods:
+    """Tests for additional fluent configuration methods."""
+
+    def test_with_timeout(self, valid_credentials: Credentials) -> None:
+        """Test with_timeout method."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        config.with_timeout(timedelta(seconds=60))
+        assert config.timeout == timedelta(seconds=60)
+
+    def test_with_retry(self, valid_credentials: Credentials) -> None:
+        """Test with_retry method."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        config.with_retry(enabled=True, max_retries=5, backoff=timedelta(seconds=10))
+        assert config.retry_enabled is True
+        assert config.max_retries == 5
+        assert config.retry_backoff == timedelta(seconds=10)
+
+    def test_with_retry_without_backoff(self, valid_credentials: Credentials) -> None:
+        """Test with_retry method without backoff."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        original_backoff = config.retry_backoff
+        config.with_retry(enabled=False, max_retries=0)
+
+        assert config.retry_enabled is False
+        assert config.max_retries == 0
+        assert config.retry_backoff == original_backoff
+
+    def test_with_service_namespace(self, valid_credentials: Credentials) -> None:
+        """Test with_service_namespace method."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        config.with_service_namespace("my-namespace")
+        assert config.service_namespace == "my-namespace"
+
+    def test_with_rate_limit(self, valid_credentials: Credentials) -> None:
+        """Test with_rate_limit method."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        config.with_rate_limit(5000)
+        assert config.rate_limit == 5000
+
+    def test_with_compression(self, valid_credentials: Credentials) -> None:
+        """Test with_compression method."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        config.with_compression(False)
+        assert config.compression is False
+
+        config.with_compression(True)
+        assert config.compression is True
+
+    def test_with_batch_settings_timeout_only(self, valid_credentials: Credentials) -> None:
+        """Test with_batch_settings with timeout only."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        original_size = config.batch_max_size
+        config.with_batch_settings(timeout=timedelta(seconds=30))
+
+        assert config.batch_timeout == timedelta(seconds=30)
+        assert config.batch_max_size == original_size
+
+    def test_with_batch_settings_size_only(self, valid_credentials: Credentials) -> None:
+        """Test with_batch_settings with size only."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        original_timeout = config.batch_timeout
+        config.with_batch_settings(max_size=1024)
+
+        assert config.batch_max_size == 1024
+        assert config.batch_timeout == original_timeout
+
+
+class TestIsSignalEnabledEdgeCases:
+    """Tests for is_signal_enabled edge cases."""
+
+    def test_logs_signal(self, valid_credentials: Credentials) -> None:
+        """Test is_signal_enabled for logs."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        ).with_logs_only()
+
+        assert config.is_signal_enabled(SignalType.LOGS) is True
+
+    def test_traces_signal(self, valid_credentials: Credentials) -> None:
+        """Test is_signal_enabled for traces."""
+        config = TelemetryConfig(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        ).with_traces_only()
+
+        assert config.is_signal_enabled(SignalType.TRACES) is True
+
+
+class TestCreateMethod:
+    """Tests for TelemetryConfig.create factory method."""
+
+    def test_create_with_defaults(self, valid_credentials: Credentials) -> None:
+        """Test create factory method with defaults."""
+        config = TelemetryConfig.create(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+        )
+
+        assert config.endpoint == "localhost:4317"
+        assert config.service_name == "test-service"
+        assert config.protocol == Protocol.GRPC
+
+    def test_create_with_kwargs(self, valid_credentials: Credentials) -> None:
+        """Test create factory method with additional kwargs."""
+        config = TelemetryConfig.create(
+            credentials=valid_credentials,
+            endpoint="localhost:4317",
+            service_name="test-service",
+            protocol=Protocol.HTTP,
+            environment="staging",
+        )
+
+        assert config.protocol == Protocol.HTTP
+        assert config.environment == "staging"

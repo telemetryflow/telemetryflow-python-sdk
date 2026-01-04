@@ -13,7 +13,6 @@ from telemetryflow import TelemetryFlowBuilder
 from telemetryflow.application.commands import SpanKind
 from telemetryflow.domain.config import Protocol
 
-
 # Skip integration tests if running in short mode or no collector available
 pytestmark = pytest.mark.integration
 
@@ -142,9 +141,8 @@ class TestClientIntegration:
 
     def test_context_manager_with_error(self, client) -> None:
         """Test span context manager handles errors properly."""
-        with pytest.raises(ValueError):
-            with client.span("error.span", SpanKind.INTERNAL):
-                raise ValueError("Test error")
+        with pytest.raises(ValueError), client.span("error.span", SpanKind.INTERNAL):
+            raise ValueError("Test error")
 
         status = client.get_status()
         assert status["spans_sent"] > 0
@@ -220,7 +218,7 @@ class TestClientIntegration:
         for i in range(10):
             client.increment_counter("export.test", 1, {"iteration": str(i)})
 
-        with client.span("export.span", SpanKind.INTERNAL) as span_id:
+        with client.span("export.span", SpanKind.INTERNAL) as _:
             client.log_info("Export test log")
             time.sleep(0.1)
 

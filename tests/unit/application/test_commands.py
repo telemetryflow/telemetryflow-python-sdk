@@ -8,6 +8,7 @@ from telemetryflow.application.commands import (
     AddSpanEventCommand,
     Command,
     CommandBus,
+    EmitBatchLogsCommand,
     EmitLogCommand,
     EndSpanCommand,
     FlushTelemetryCommand,
@@ -311,3 +312,91 @@ class TestCommandBus:
 
         with pytest.raises(ValueError, match="No handler registered"):
             bus.dispatch(FlushTelemetryCommand())
+
+
+class TestCommandValidation:
+    """Tests for command validation in __post_init__."""
+
+    def test_initialize_command_requires_config(self) -> None:
+        """Test that InitializeSDKCommand requires config."""
+        with pytest.raises(ValueError, match="config is required"):
+            InitializeSDKCommand(config=None)
+
+    def test_record_metric_command_requires_name(self) -> None:
+        """Test that RecordMetricCommand requires name."""
+        with pytest.raises(ValueError, match="name is required"):
+            RecordMetricCommand(name="", value=1.0)
+
+    def test_record_counter_command_requires_name(self) -> None:
+        """Test that RecordCounterCommand requires name."""
+        with pytest.raises(ValueError, match="name is required"):
+            RecordCounterCommand(name="")
+
+    def test_record_gauge_command_requires_name(self) -> None:
+        """Test that RecordGaugeCommand requires name."""
+        with pytest.raises(ValueError, match="name is required"):
+            RecordGaugeCommand(name="", value=1.0)
+
+    def test_record_histogram_command_requires_name(self) -> None:
+        """Test that RecordHistogramCommand requires name."""
+        with pytest.raises(ValueError, match="name is required"):
+            RecordHistogramCommand(name="", value=1.0)
+
+    def test_emit_log_command_requires_message(self) -> None:
+        """Test that EmitLogCommand requires message."""
+        with pytest.raises(ValueError, match="message is required"):
+            EmitLogCommand(message="")
+
+    def test_start_span_command_requires_name(self) -> None:
+        """Test that StartSpanCommand requires name."""
+        with pytest.raises(ValueError, match="name is required"):
+            StartSpanCommand(name="")
+
+    def test_end_span_command_requires_span_id(self) -> None:
+        """Test that EndSpanCommand requires span_id."""
+        with pytest.raises(ValueError, match="span_id is required"):
+            EndSpanCommand(span_id="")
+
+    def test_add_span_event_requires_span_id(self) -> None:
+        """Test that AddSpanEventCommand requires span_id."""
+        with pytest.raises(ValueError, match="span_id is required"):
+            AddSpanEventCommand(span_id="", name="test")
+
+    def test_add_span_event_requires_name(self) -> None:
+        """Test that AddSpanEventCommand requires name."""
+        with pytest.raises(ValueError, match="name is required"):
+            AddSpanEventCommand(span_id="span-123", name="")
+
+
+class TestCommandBaseClass:
+    """Tests for Command base class."""
+
+    def test_command_type_property(self) -> None:
+        """Test that command_type returns class name."""
+        cmd = FlushTelemetryCommand()
+        assert cmd.command_type == "FlushTelemetryCommand"
+
+    def test_timestamp_is_datetime(self) -> None:
+        """Test that timestamp is a datetime."""
+        cmd = FlushTelemetryCommand()
+        assert isinstance(cmd.timestamp, datetime)
+
+
+class TestEmitBatchLogsCommand:
+    """Tests for EmitBatchLogsCommand."""
+
+    def test_default_empty_logs(self) -> None:
+        """Test default empty logs list."""
+        cmd = EmitBatchLogsCommand()
+        assert cmd.logs == []
+
+    def test_with_multiple_logs(self) -> None:
+        """Test with multiple logs."""
+        logs = [
+            EmitLogCommand(message="Log 1"),
+            EmitLogCommand(message="Log 2", severity=SeverityLevel.ERROR),
+        ]
+        cmd = EmitBatchLogsCommand(logs=logs)
+        assert len(cmd.logs) == 2
+        assert cmd.logs[0].message == "Log 1"
+        assert cmd.logs[1].severity == SeverityLevel.ERROR

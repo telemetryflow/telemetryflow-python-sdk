@@ -91,9 +91,7 @@ class TestTelemetryFlowBuilder:
 
     def test_with_signals(self) -> None:
         """Test setting signal configuration."""
-        builder = TelemetryFlowBuilder().with_signals(
-            metrics=True, logs=False, traces=True
-        )
+        builder = TelemetryFlowBuilder().with_signals(metrics=True, logs=False, traces=True)
 
         assert builder._enable_metrics is True
         assert builder._enable_logs is False
@@ -293,9 +291,7 @@ class TestBuilderEnvironmentVariables:
 
     def test_with_endpoint_from_env(self) -> None:
         """Test loading endpoint from environment."""
-        with mock.patch.dict(
-            os.environ, {"TELEMETRYFLOW_ENDPOINT": "custom.endpoint:4317"}
-        ):
+        with mock.patch.dict(os.environ, {"TELEMETRYFLOW_ENDPOINT": "custom.endpoint:4317"}):
             builder = TelemetryFlowBuilder().with_endpoint_from_env()
 
             assert builder._endpoint == "custom.endpoint:4317"
@@ -340,9 +336,7 @@ class TestBuilderEnvironmentVariables:
 
     def test_with_collector_id_from_env(self) -> None:
         """Test loading collector ID from environment."""
-        with mock.patch.dict(
-            os.environ, {"TELEMETRYFLOW_COLLECTOR_ID": "collector-env"}
-        ):
+        with mock.patch.dict(os.environ, {"TELEMETRYFLOW_COLLECTOR_ID": "collector-env"}):
             builder = TelemetryFlowBuilder().with_collector_id_from_env()
 
             assert builder._collector_id == "collector-env"

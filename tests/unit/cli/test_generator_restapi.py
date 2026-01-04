@@ -8,22 +8,22 @@ import pytest
 from telemetryflow.cli.generator_restapi import (
     EntityField,
     TemplateData,
+    generate_dto_fields,
+    generate_field_definitions,
+    generate_sqlalchemy_columns,
     get_template_dir,
     load_template,
-    render_template,
-    render_template_file,
-    render_entity_template_file,
-    to_pascal_case,
-    to_camel_case,
-    to_snake_case,
-    pluralize,
+    main,
     map_type_to_python,
     map_type_to_sqlalchemy,
     parse_fields,
-    generate_field_definitions,
-    generate_sqlalchemy_columns,
-    generate_dto_fields,
-    main,
+    pluralize,
+    render_entity_template_file,
+    render_template,
+    render_template_file,
+    to_camel_case,
+    to_pascal_case,
+    to_snake_case,
 )
 
 
@@ -370,12 +370,16 @@ class TestCLI:
     def test_cli_new_creates_project(self) -> None:
         """Test CLI new command creates project."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = main([
-                "--no-banner",
-                "new",
-                "-n", "test-project",
-                "-o", tmpdir,
-            ])
+            result = main(
+                [
+                    "--no-banner",
+                    "new",
+                    "-n",
+                    "test-project",
+                    "-o",
+                    tmpdir,
+                ]
+            )
 
             assert result == 0
 
@@ -403,22 +407,31 @@ class TestCLI:
     def test_cli_new_with_custom_options(self) -> None:
         """Test CLI new command with custom options."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = main([
-                "--no-banner",
-                "new",
-                "-n", "custom-api",
-                "-o", tmpdir,
-                "--port", "8080",
-                "--db-driver", "sqlite",
-                "--environment", "testing",
-                "--force",  # Force to overwrite __init__.py with config
-            ])
+            result = main(
+                [
+                    "--no-banner",
+                    "new",
+                    "-n",
+                    "custom-api",
+                    "-o",
+                    tmpdir,
+                    "--port",
+                    "8080",
+                    "--db-driver",
+                    "sqlite",
+                    "--environment",
+                    "testing",
+                    "--force",  # Force to overwrite __init__.py with config
+                ]
+            )
 
             assert result == 0
 
             # Check config contains custom values
             project_dir = Path(tmpdir) / "custom-api"
-            config_file = project_dir / "src" / "custom_api" / "infrastructure" / "config" / "__init__.py"
+            config_file = (
+                project_dir / "src" / "custom_api" / "infrastructure" / "config" / "__init__.py"
+            )
             config_content = config_file.read_text()
 
             assert "8080" in config_content

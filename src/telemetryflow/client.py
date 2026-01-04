@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import threading
+from collections.abc import Generator
 from contextlib import contextmanager
-from datetime import UTC, datetime, timedelta
-from typing import TYPE_CHECKING, Any, Generator
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 from telemetryflow.application.commands import (
     AddSpanEventCommand,
@@ -443,13 +444,12 @@ class TelemetryFlowClient:
     def _ensure_initialized(self) -> None:
         """Ensure the client is initialized."""
         if not self._initialized:
-            raise NotInitializedError(
-                "Client is not initialized. Call initialize() first."
-            )
+            raise NotInitializedError("Client is not initialized. Call initialize() first.")
 
     def _get_version(self) -> str:
         """Get the SDK version."""
         from telemetryflow.version import __version__
+
         return __version__
 
     def __enter__(self) -> TelemetryFlowClient:

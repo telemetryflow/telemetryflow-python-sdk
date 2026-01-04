@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 from datetime import timedelta
 from typing import TYPE_CHECKING
@@ -175,9 +176,7 @@ class TelemetryFlowBuilder:
 
     # Service Configuration
 
-    def with_service(
-        self, name: str, version: str | None = None
-    ) -> TelemetryFlowBuilder:
+    def with_service(self, name: str, version: str | None = None) -> TelemetryFlowBuilder:
         """
         Set the service name and optional version.
 
@@ -424,9 +423,7 @@ class TelemetryFlowBuilder:
         self._custom_attributes[key] = value
         return self
 
-    def with_custom_attributes(
-        self, attributes: dict[str, str]
-    ) -> TelemetryFlowBuilder:
+    def with_custom_attributes(self, attributes: dict[str, str]) -> TelemetryFlowBuilder:
         """
         Add multiple custom resource attributes.
 
@@ -544,39 +541,29 @@ class TelemetryFlowBuilder:
 
         # Timeout (in seconds)
         timeout_str = os.environ.get(self.ENV_TIMEOUT, "10")
-        try:
+        with contextlib.suppress(ValueError):
             self._timeout = timedelta(seconds=int(timeout_str))
-        except ValueError:
-            pass
 
         # Retry settings
         retry_enabled_str = os.environ.get(self.ENV_RETRY_ENABLED, "true")
         self._retry_enabled = retry_enabled_str.lower() == "true"
 
         max_retries_str = os.environ.get(self.ENV_MAX_RETRIES, "3")
-        try:
+        with contextlib.suppress(ValueError):
             self._max_retries = int(max_retries_str)
-        except ValueError:
-            pass
 
         retry_backoff_str = os.environ.get(self.ENV_RETRY_BACKOFF, "500")
-        try:
+        with contextlib.suppress(ValueError):
             self._retry_backoff = timedelta(milliseconds=int(retry_backoff_str))
-        except ValueError:
-            pass
 
         # Batch settings
         batch_timeout_str = os.environ.get(self.ENV_BATCH_TIMEOUT, "5000")
-        try:
+        with contextlib.suppress(ValueError):
             self._batch_timeout = timedelta(milliseconds=int(batch_timeout_str))
-        except ValueError:
-            pass
 
         batch_max_size_str = os.environ.get(self.ENV_BATCH_MAX_SIZE, "512")
-        try:
+        with contextlib.suppress(ValueError):
             self._batch_max_size = int(batch_max_size_str)
-        except ValueError:
-            pass
 
         # Signal settings
         enable_traces_str = os.environ.get(self.ENV_ENABLE_TRACES, "true")

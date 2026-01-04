@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from telemetryflow.middleware.base import TelemetryMiddleware
 
 if TYPE_CHECKING:
-    from starlette.requests import Request
-    from starlette.responses import Response
     from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
     from telemetryflow.client import TelemetryFlowClient

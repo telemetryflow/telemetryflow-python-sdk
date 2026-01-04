@@ -79,6 +79,20 @@ restapi = [
     "pydantic>=2.5.0",
     "python-dotenv>=1.0.0",
 ]
+instrumentation = [
+    "opentelemetry-instrumentation>=0.49b0",
+    "opentelemetry-instrumentation-flask>=0.49b0",
+    "opentelemetry-instrumentation-fastapi>=0.49b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.49b0",
+    "opentelemetry-instrumentation-requests>=0.49b0",
+    "opentelemetry-instrumentation-httpx>=0.49b0",
+    "opentelemetry-instrumentation-logging>=0.49b0",
+    "opentelemetry-instrumentation-psycopg2>=0.49b0",
+    "opentelemetry-instrumentation-redis>=0.49b0",
+]
+all = [
+    "telemetryflow-sdk[http,grpc,restapi,instrumentation]",
+]
 
 [project.urls]
 Homepage = "https://telemetryflow.id"
@@ -123,6 +137,11 @@ omit = [
     "*/tests/*",
     "*/__pycache__/*",
     "*/cli/*",
+    # Optional middleware - excluded when framework not installed
+    "*/middleware/flask.py",
+    "*/middleware/fastapi.py",
+    # Conditional imports for optional frameworks
+    "*/middleware/__init__.py",
 ]
 
 [tool.coverage.report]
@@ -134,7 +153,7 @@ exclude_lines = [
     "if __name__ == .__main__.:",
 ]
 show_missing = true
-fail_under = 80
+fail_under = 95
 
 [tool.mypy]
 python_version = "3.12"

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from abc import ABC
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import Enum
@@ -18,10 +17,15 @@ class HealthStatus(str, Enum):
 
 
 @dataclass
-class Query(ABC):
+class Query:
     """Base class for all queries."""
 
     timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+    @property
+    def query_type(self) -> str:
+        """Return the query type identifier."""
+        return self.__class__.__name__
 
 
 class QueryHandler(Protocol):

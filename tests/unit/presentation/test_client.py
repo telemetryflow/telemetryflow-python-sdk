@@ -94,7 +94,9 @@ class TestTelemetryFlowClient:
         # Should not raise
         client.shutdown()
 
-    def test_config_property(self, client: TelemetryFlowClient, valid_config: TelemetryConfig) -> None:
+    def test_config_property(
+        self, client: TelemetryFlowClient, valid_config: TelemetryConfig
+    ) -> None:
         """Test config property."""
         assert client.config == valid_config
         assert client.config.service_name == "test-service"
@@ -235,9 +237,8 @@ class TestTelemetryFlowClientInitialized:
         """Test span context manager handles errors."""
         client.initialize()
 
-        with pytest.raises(ValueError):
-            with client.span("test.span") as span_id:
-                raise ValueError("Test error")
+        with pytest.raises(ValueError), client.span("test.span") as _:
+            raise ValueError("Test error")
 
         client.shutdown()
 

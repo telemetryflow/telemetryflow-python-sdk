@@ -12,7 +12,7 @@ import argparse
 import re
 import sys
 from dataclasses import dataclass, field
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from importlib import resources
 from pathlib import Path
 from string import Template
@@ -20,7 +20,6 @@ from typing import Any
 
 from telemetryflow.banner import print_banner
 from telemetryflow.version import __version__
-
 
 # =============================================================================
 # DATA STRUCTURES
@@ -273,7 +272,9 @@ def get_template_dir(subdir: str = "project") -> Path:
         return cli_dir / "templates" / "restapi" / subdir
 
 
-def load_template(template_name: str, subdir: str = "project", template_dir: Path | None = None) -> str:
+def load_template(
+    template_name: str, subdir: str = "project", template_dir: Path | None = None
+) -> str:
     """Load a template file from the specified subdirectory.
 
     Args:
@@ -376,9 +377,7 @@ def generate_sqlalchemy_columns(fields: list[EntityField]) -> str:
     lines = []
     for f in fields:
         nullable = ", nullable=True" if f.nullable else ", nullable=False"
-        lines.append(
-            f"    {to_snake_case(f.name)} = Column({f.sqlalchemy_type}{nullable})"
-        )
+        lines.append(f"    {to_snake_case(f.name)} = Column({f.sqlalchemy_type}{nullable})")
     return "\n".join(lines)
 
 
@@ -397,7 +396,7 @@ def generate_validation_code(fields: list[EntityField]) -> str:
     for f in fields:
         if not f.nullable:
             snake_name = to_snake_case(f.name)
-            lines.append(f'        if not self.{snake_name}:')
+            lines.append(f"        if not self.{snake_name}:")
             lines.append(f'            raise ValueError("{snake_name} is required")')
     return "\n".join(lines)
 
@@ -623,7 +622,9 @@ def generate_project(
     print("  4. pip install -e '.[dev]'")
     print("  5. make run")
     print("\nTo add a new entity:")
-    print(f"  telemetryflow-restapi entity -n User -f 'name:string,email:string' -o {data.project_name}")
+    print(
+        f"  telemetryflow-restapi entity -n User -f 'name:string,email:string' -o {data.project_name}"
+    )
 
 
 def generate_entity(
@@ -769,9 +770,10 @@ def cmd_entity(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_version(args: argparse.Namespace) -> int:
+def cmd_version(_args: argparse.Namespace) -> int:
     """Show version information."""
     from telemetryflow.version import info
+
     print(info())
     return 0
 
@@ -808,11 +810,15 @@ def main(argv: list[str] | None = None) -> int:
         description="Generate a complete DDD + CQRS RESTful API project structure",
     )
     new_parser.add_argument("-n", "--name", required=True, help="Project name")
-    new_parser.add_argument("-m", "--module", help="Python module name (defaults to snake_case of name)")
+    new_parser.add_argument(
+        "-m", "--module", help="Python module name (defaults to snake_case of name)"
+    )
     new_parser.add_argument("--service", help="Service name (defaults to project name)")
     new_parser.add_argument("--version", dest="version", default="1.0.0", help="Service version")
     new_parser.add_argument("--environment", default="development", help="Environment")
-    new_parser.add_argument("--db-driver", default="postgresql", help="Database driver (postgresql, mysql, sqlite)")
+    new_parser.add_argument(
+        "--db-driver", default="postgresql", help="Database driver (postgresql, mysql, sqlite)"
+    )
     new_parser.add_argument("--db-host", default="localhost", help="Database host")
     new_parser.add_argument("--db-port", default="5432", help="Database port")
     new_parser.add_argument("--db-name", help="Database name (defaults to project name)")
@@ -833,8 +839,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Add a new entity with full CRUD",
         description="Generate domain entity, repository, commands, queries, handlers, and API endpoints",
     )
-    entity_parser.add_argument("-n", "--name", required=True, help="Entity name (e.g., User, Product)")
-    entity_parser.add_argument("-f", "--fields", help="Entity fields (e.g., 'name:string,email:string,age:int')")
+    entity_parser.add_argument(
+        "-n", "--name", required=True, help="Entity name (e.g., User, Product)"
+    )
+    entity_parser.add_argument(
+        "-f", "--fields", help="Entity fields (e.g., 'name:string,email:string,age:int')"
+    )
     entity_parser.add_argument("-o", "--output", help="Project root directory")
     entity_parser.add_argument("--force", action="store_true", help="Overwrite existing files")
     entity_parser.add_argument("--template-dir", help="Custom template directory")
