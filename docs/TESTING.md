@@ -449,14 +449,21 @@ pie title Coverage Targets by Layer
     "Client (85%+)" : 85
 ```
 
-| Layer | Target | Focus Areas |
-|-------|--------|-------------|
-| Domain | 90%+ | Value objects, validation |
-| Application | 85%+ | Commands, queries, buses |
-| Infrastructure | 80%+ | Handlers, exporters |
-| Client | 85%+ | Public API, lifecycle |
+| Layer          | Target | Focus Areas               |
+| -------------- | ------ | ------------------------- |
+| Domain         | 90%+   | Value objects, validation |
+| Application    | 85%+   | Commands, queries, buses  |
+| Infrastructure | 80%+   | Handlers, exporters       |
+| Client         | 85%+   | Public API, lifecycle     |
 
 ## CI/CD Integration
+
+### Supported Python Versions
+
+The SDK is tested on **Python 3.12 and 3.13**:
+
+- **Python 3.12**: Minimum supported version (LTS)
+- **Python 3.13**: Latest stable version
 
 ### GitHub Actions Example
 
@@ -484,27 +491,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+      - name: Install CI dependencies
+        run: make ci-deps
 
       - name: Run linting
-        run: |
-          ruff check src/ tests/
+        run: make ci-lint
 
-      - name: Run type checking
-        run: |
-          mypy src/
-
-      - name: Run tests with coverage
-        run: |
-          pytest --cov=telemetryflow --cov-report=xml
+      - name: Run unit tests
+        run: make ci-test-unit
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
-          file: ./coverage.xml
+          file: ./coverage-unit.xml
 ```
 
 ### Pre-commit Hooks
@@ -618,6 +617,7 @@ def test_record_histogram_with_attributes(self, client):
 ### Tests Hanging
 
 If tests hang, check for:
+
 - Unended spans
 - Unclosed connections
 - Missing shutdown calls

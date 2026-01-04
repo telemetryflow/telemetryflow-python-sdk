@@ -60,7 +60,7 @@ graph TB
 
 ### Python Version
 
-Python 3.12 or higher is required:
+Python 3.12 or higher is required (tested on 3.12 and 3.13):
 
 ```bash
 python --version  # Should be 3.12+
@@ -80,17 +80,26 @@ Or with all optional dependencies:
 pip install -e ".[dev,http,grpc]"
 ```
 
+The `[dev]` extra includes all development tools:
+
+- pytest, pytest-asyncio, pytest-cov - Testing
+- mypy - Type checking
+- ruff - Linting
+- black, isort - Formatting
+- pre-commit - Git hooks
+- build - Package building (wheel/sdist)
+
 ### Required Tools
 
-| Tool | Purpose | Installation |
-|------|---------|--------------|
-| pip | Package installer | Built-in |
-| pytest | Testing | `pip install pytest` |
-| ruff | Linting/formatting | `pip install ruff` |
-| mypy | Type checking | `pip install mypy` |
-| black | Code formatting | `pip install black` |
-| build | Package building | `pip install build` |
-| twine | Package publishing | `pip install twine` |
+| Tool   | Purpose            | Installation        |
+| ------ | ------------------ | ------------------- |
+| pip    | Package installer  | Built-in            |
+| pytest | Testing            | Included in `[dev]` |
+| ruff   | Linting/formatting | Included in `[dev]` |
+| mypy   | Type checking      | Included in `[dev]` |
+| black  | Code formatting    | Included in `[dev]` |
+| build  | Package building   | Included in `[dev]` |
+| twine  | Package publishing | `pip install twine` |
 
 ## Project Structure
 
@@ -279,6 +288,7 @@ make format
 ```
 
 Equivalent to:
+
 ```bash
 black src/ tests/
 isort src/ tests/
@@ -321,8 +331,9 @@ make build
 ```
 
 Creates:
-- `dist/telemetryflow_sdk-1.1.1-py3-none-any.whl`
-- `dist/telemetryflow_sdk-1.1.1.tar.gz`
+
+- `dist/telemetryflow_sdk-1.1.2-py3-none-any.whl`
+- `dist/telemetryflow_sdk-1.1.2.tar.gz`
 
 #### make clean
 
@@ -333,6 +344,7 @@ make clean
 ```
 
 Removes:
+
 - `build/`
 - `dist/`
 - `*.egg-info/`
@@ -497,18 +509,18 @@ ls -la dist/
 
 ```
 dist/
-├── telemetryflow_sdk-1.1.1-py3-none-any.whl  # Wheel (binary)
-└── telemetryflow_sdk-1.1.1.tar.gz            # Source distribution
+├── telemetryflow_sdk-1.1.2-py3-none-any.whl  # Wheel (binary)
+└── telemetryflow_sdk-1.1.2.tar.gz            # Source distribution
 ```
 
 ### Installing Built Package
 
 ```bash
 # Install wheel
-pip install dist/telemetryflow_sdk-1.1.1-py3-none-any.whl
+pip install dist/telemetryflow_sdk-1.1.2-py3-none-any.whl
 
 # Install from source
-pip install dist/telemetryflow_sdk-1.1.1.tar.gz
+pip install dist/telemetryflow_sdk-1.1.2.tar.gz
 ```
 
 ## Publishing
@@ -669,7 +681,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telemetryflow-sdk"
-version = "1.1.1"
+version = "1.1.2"
 requires-python = ">=3.12"
 
 [tool.pytest.ini_options]
@@ -697,7 +709,36 @@ line-length = 100
 
 ### GitHub Actions
 
-Create `.github/workflows/ci.yml`:
+The project uses GitHub Actions for CI/CD with the following workflows:
+
+| Workflow      | Trigger           | Purpose                                |
+| ------------- | ----------------- | -------------------------------------- |
+| `ci.yml`      | Push/PR           | Lint, test, build verification         |
+| `docker.yml`  | Push to main/tags | Build Docker images                    |
+| `release.yml` | Tags (v*.*.\*)    | Publish to PyPI, create GitHub release |
+
+### Python Version Matrix
+
+CI tests are run on **Python 3.12 and 3.13** to ensure compatibility:
+
+```yaml
+strategy:
+  matrix:
+    python-version: ["3.12", "3.13"]
+```
+
+### CI Jobs
+
+The CI workflow includes:
+
+1. **Lint & Code Quality** - Runs `make ci-lint` (ruff, mypy, format checks)
+2. **Unit Tests** - Runs `make ci-test-unit` on Python 3.12 and 3.13
+3. **Integration Tests** - Runs `make ci-test-integration`
+4. **Build Verification** - Tests on Ubuntu, macOS, and Windows
+5. **Security Scan** - Runs `make ci-security` (bandit)
+6. **Coverage Report** - Generates and uploads coverage reports
+
+### Example CI Configuration
 
 ```yaml
 name: CI
@@ -724,16 +765,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: pip install -e ".[dev]"
+        run: make ci-deps
 
       - name: Lint
-        run: make lint
-
-      - name: Type check
-        run: make typecheck
+        run: make ci-lint
 
       - name: Test
-        run: make test-coverage
+        run: make ci-test-unit
 
   build:
     runs-on: ubuntu-latest
@@ -747,10 +785,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install dependencies
+        run: make ci-deps
+
       - name: Build
-        run: |
-          pip install build
-          make build
+        run: make ci-build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

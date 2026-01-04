@@ -34,6 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Build Package in Dev Dependencies**: Added `build>=1.0.0` to dev dependencies for local package building
+- **gRPC Header Lowercase Support**: Added `_get_grpc_headers()` method in `OTLPExporterFactory` to ensure gRPC metadata keys are lowercase (required by gRPC specification)
+- **Comprehensive Unit Tests**: Added `TestGetGrpcHeaders` test class for gRPC header handling
+
 - **TFO v2 API Configuration Alignment**: Updated SDK configuration to align with TFO-Collector v1.1.2 (OCB-native)
   - Added `v2_api` configuration section with `enabled` and `v2_only` options
   - Added custom endpoint paths support (`traces_endpoint`, `metrics_endpoint`, `logs_endpoint`)
@@ -73,9 +77,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **CI Python Version Matrix**: Updated CI workflow to test on Python 3.12 and 3.13 only (aligned with `requires-python = ">=3.12"`)
 - Updated version to 1.1.2 to align with TFO-Collector v1.1.2 release
 - Default endpoint changed from `api.telemetryflow.id:4317` to `localhost:4317` for development
 - Added `TELEMETRYFLOW_PROTOCOL` and `TELEMETRYFLOW_TIMEOUT` environment variables
+
+### Fixed
+
+- **gRPC Header Case Sensitivity**: Fixed gRPC exporter to use lowercase header keys (gRPC metadata specification requires lowercase keys)
 
 ### SDK Configuration Structure
 
