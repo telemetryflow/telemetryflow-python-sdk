@@ -12,6 +12,8 @@ Features:
     - Full OpenTelemetry compatibility
 """
 
+from typing import Any
+
 from telemetryflow.builder import TelemetryFlowBuilder
 from telemetryflow.client import TelemetryFlowClient
 from telemetryflow.domain.config import Protocol, SignalType, TelemetryConfig
@@ -66,7 +68,7 @@ def new_simple(
 
 def auto_instrument(
     client: TelemetryFlowClient | None = None,
-    **kwargs: object,
+    **kwargs: Any,
 ) -> dict[str, bool]:
     """Auto-instrument all available libraries.
 

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 from telemetryflow.middleware.base import TelemetryMiddleware
 
 if TYPE_CHECKING:
-    from flask import Flask, Response
+    from flask import Flask, Response  # type: ignore[import-not-found]
 
     from telemetryflow.client import TelemetryFlowClient
 

@@ -116,7 +116,7 @@ class TelemetryCommandHandler:
         if handler is None:
             raise ValueError(f"Unknown command type: {type(command).__name__}")
 
-        return handler(command)
+        return handler(command)  # type: ignore[operator]
 
     def _handle_initialize(self, command: InitializeSDKCommand) -> None:
         """Initialize the SDK with the given configuration."""

@@ -8,7 +8,13 @@ from typing import TYPE_CHECKING, Any
 from telemetryflow.middleware.base import TelemetryMiddleware
 
 if TYPE_CHECKING:
-    from starlette.types import ASGIApp, Message, Receive, Scope, Send
+    from starlette.types import (  # type: ignore[import-not-found]
+        ASGIApp,
+        Message,
+        Receive,
+        Scope,
+        Send,
+    )
 
     from telemetryflow.client import TelemetryFlowClient
 

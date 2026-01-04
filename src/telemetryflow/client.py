@@ -335,7 +335,8 @@ class TelemetryFlowClient:
             kind=kind,
             attributes=attributes or {},
         )
-        return self._handler.handle(command)
+        result: str = self._handler.handle(command)
+        return result
 
     def end_span(
         self,
