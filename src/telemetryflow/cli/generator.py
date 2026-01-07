@@ -128,7 +128,7 @@ def load_template(template_name: str, template_dir: Path | None = None) -> str:
     if not template_path.exists():
         raise FileNotFoundError(f"Template not found: {template_path}")
 
-    return template_path.read_text()
+    return template_path.read_text(encoding="utf-8")
 
 
 def render_template(template_str: str, data: TemplateData) -> str:
@@ -177,7 +177,7 @@ def write_file(path: Path, content: str, force: bool = False) -> bool:
         return False
 
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content)
+    path.write_text(content, encoding="utf-8")
     print(f"Generated: {path}")
     return True
 
