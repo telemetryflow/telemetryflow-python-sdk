@@ -78,7 +78,7 @@ LABEL org.opencontainers.image.title="TelemetryFlow Python SDK" \
       org.opencontainers.image.base.name="python:3.12-slim" \
       # TelemetryFlow specific labels
       io.telemetryflow.product="TelemetryFlow Python SDK" \
-      io.telemetryflow.component="telemetryflow-sdk" \
+      io.telemetryflow.component="telemetryflow-python-sdk" \
       io.telemetryflow.platform="CEOP" \
       io.telemetryflow.maintainer="DevOpsCorner Indonesia"
 

@@ -64,7 +64,7 @@ services:
       - ./workspace:/workspace
     working_dir: /workspace
     networks:
-      - telemetryflow-sdk
+      - telemetryflow-python-sdk
 
   # ---------------------------------------------------------------------------
   # RESTful API Generator
@@ -96,7 +96,7 @@ services:
       otel-collector:
         condition: service_healthy
     networks:
-      - telemetryflow-sdk
+      - telemetryflow-python-sdk
     profiles:
       - example
 
@@ -131,7 +131,7 @@ services:
       otel-collector:
         condition: service_healthy
     networks:
-      - telemetryflow-sdk
+      - telemetryflow-python-sdk
     profiles:
       - dev
 
@@ -184,7 +184,7 @@ services:
       retries: 5
       start_period: 10s
     networks:
-      - telemetryflow-sdk
+      - telemetryflow-python-sdk
 
   # ---------------------------------------------------------------------------
   # Jaeger (for trace visualization)
@@ -199,7 +199,7 @@ services:
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     networks:
-      - telemetryflow-sdk
+      - telemetryflow-python-sdk
     profiles:
       - dev
       - full
@@ -220,7 +220,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.enable-lifecycle'
     networks:
-      - telemetryflow-sdk
+      - telemetryflow-python-sdk
     profiles:
       - full
 
@@ -240,7 +240,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
     networks:
-      - telemetryflow-sdk
+      - telemetryflow-python-sdk
     profiles:
       - full
 
@@ -257,6 +257,6 @@ volumes:
 # Networks
 # -----------------------------------------------------------------------------
 networks:
-  telemetryflow-sdk:
+  telemetryflow-python-sdk:
     driver: bridge
     name: telemetryflow-python-sdk-network

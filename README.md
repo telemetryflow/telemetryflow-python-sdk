@@ -75,23 +75,23 @@ graph TB
 ## Installation
 
 ```bash
-pip install telemetryflow-sdk
+pip install telemetryflow-python-sdk
 ```
 
 With optional dependencies:
 
 ```bash
 # HTTP framework support (Flask, FastAPI)
-pip install telemetryflow-sdk[http]
+pip install telemetryflow-python-sdk[http]
 
 # gRPC support
-pip install telemetryflow-sdk[grpc]
+pip install telemetryflow-python-sdk[grpc]
 
 # Development tools
-pip install telemetryflow-sdk[dev]
+pip install telemetryflow-python-sdk[dev]
 
 # All extras
-pip install telemetryflow-sdk[dev,http,grpc]
+pip install telemetryflow-python-sdk[dev,http,grpc]
 ```
 
 ## Quick Start

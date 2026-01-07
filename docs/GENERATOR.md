@@ -7,7 +7,7 @@ The `telemetryflow-gen` CLI tool helps you quickly set up TelemetryFlow SDK inte
 The generator is installed automatically with the SDK:
 
 ```bash
-pip install telemetryflow-sdk
+pip install telemetryflow-python-sdk
 ```
 
 Verify installation:
@@ -335,7 +335,7 @@ command not found: telemetryflow-gen
 **Solution:** Reinstall the SDK or check your PATH:
 
 ```bash
-pip install --force-reinstall telemetryflow-sdk
+pip install --force-reinstall telemetryflow-python-sdk
 # or
 python -m telemetryflow.cli.generator init
 ```

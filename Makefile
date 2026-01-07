@@ -310,7 +310,7 @@ install-dev:
 
 uninstall:
 	@echo "$(GREEN)Uninstalling package...$(NC)"
-	@$(PIP) uninstall -y telemetryflow-sdk
+	@$(PIP) uninstall -y telemetryflow-python-sdk
 	@echo "$(GREEN)Package uninstalled$(NC)"
 
 ## Publishing

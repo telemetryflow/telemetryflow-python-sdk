@@ -25,7 +25,7 @@ dependencies = [
     "alembic>=1.13.0",
     "pydantic>=2.5.0",
     "python-dotenv>=1.0.0",
-    "telemetryflow-sdk>=1.1.1",
+    "telemetryflow-python-sdk>=1.1.1",
 ]
 
 [project.optional-dependencies]

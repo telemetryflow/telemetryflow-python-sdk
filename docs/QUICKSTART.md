@@ -11,7 +11,7 @@ Get started with TelemetryFlow Python SDK in 5 minutes.
 ## Installation
 
 ```bash
-pip install telemetryflow-sdk
+pip install telemetryflow-python-sdk
 ```
 
 Or install from source:

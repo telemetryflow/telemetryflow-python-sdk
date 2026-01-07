@@ -29,7 +29,7 @@ pydantic>=2.5.0
 python-dotenv>=1.0.0
 
 # TelemetryFlow (Observability)
-telemetryflow-sdk>=1.1.0
+telemetryflow-python-sdk>=1.1.0
 
 # Production Server
 gunicorn>=21.0.0

@@ -332,8 +332,8 @@ make build
 
 Creates:
 
-- `dist/telemetryflow_sdk-1.1.2-py3-none-any.whl`
-- `dist/telemetryflow_sdk-1.1.2.tar.gz`
+- `dist/telemetryflow_python_sdk-1.1.2-py3-none-any.whl`
+- `dist/telemetryflow_python_sdk-1.1.2.tar.gz`
 
 #### make clean
 
@@ -509,18 +509,18 @@ ls -la dist/
 
 ```
 dist/
-├── telemetryflow_sdk-1.1.2-py3-none-any.whl  # Wheel (binary)
-└── telemetryflow_sdk-1.1.2.tar.gz            # Source distribution
+├── telemetryflow_python_sdk-1.1.2-py3-none-any.whl  # Wheel (binary)
+└── telemetryflow_python_sdk-1.1.2.tar.gz            # Source distribution
 ```
 
 ### Installing Built Package
 
 ```bash
 # Install wheel
-pip install dist/telemetryflow_sdk-1.1.2-py3-none-any.whl
+pip install dist/telemetryflow_python_sdk-1.1.2-py3-none-any.whl
 
 # Install from source
-pip install dist/telemetryflow_sdk-1.1.2.tar.gz
+pip install dist/telemetryflow_python_sdk-1.1.2.tar.gz
 ```
 
 ## Publishing
@@ -578,7 +578,7 @@ make build
 make publish-test
 
 # 6. Test installation
-pip install --index-url https://test.pypi.org/simple/ telemetryflow-sdk
+pip install --index-url https://test.pypi.org/simple/ telemetryflow-python-sdk
 
 # 7. Publish to production PyPI
 make publish
@@ -633,9 +633,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY dist/telemetryflow_sdk-*.whl .
+COPY dist/telemetryflow_python_sdk-*.whl .
 
-RUN pip install --no-cache-dir telemetryflow_sdk-*.whl
+RUN pip install --no-cache-dir telemetryflow_python_sdk-*.whl
 
 # Example application
 COPY examples/basic/main.py .
@@ -680,7 +680,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "telemetryflow-sdk"
+name = "telemetryflow-python-sdk"
 version = "1.1.2"
 requires-python = ">=3.12"
 
