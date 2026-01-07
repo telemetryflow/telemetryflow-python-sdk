@@ -220,7 +220,7 @@ jobs:
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
-          PKG_DIR=telemetryflow-sdk_${VERSION}_${{ matrix.arch }}
+          PKG_DIR=telemetryflow-python-sdk_${VERSION}_${{ matrix.arch }}
           mkdir -p ${PKG_DIR}/DEBIAN
           mkdir -p ${PKG_DIR}/usr/local/bin
 
@@ -235,7 +235,7 @@ jobs:
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
-          PKG_DIR=telemetryflow-sdk_${VERSION}_${{ matrix.arch }}
+          PKG_DIR=telemetryflow-python-sdk_${VERSION}_${{ matrix.arch }}
 
           # Control file
           cat > ${PKG_DIR}/DEBIAN/control << EOF
@@ -271,7 +271,7 @@ jobs:
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
-          PKG_DIR=telemetryflow-sdk_${VERSION}_${{ matrix.arch }}
+          PKG_DIR=telemetryflow-python-sdk_${VERSION}_${{ matrix.arch }}
           dpkg-deb --build ${PKG_DIR}
           mkdir -p packages
           mv ${PKG_DIR}.deb packages/
@@ -363,7 +363,7 @@ jobs:
           3. Run: .\install.ps1
 
           Or install via pip:
-          pip install telemetryflow-sdk
+          pip install telemetryflow-python-sdk
 
           Available Commands:
           - telemetryflow-gen.exe     - SDK code generator
@@ -456,7 +456,7 @@ jobs:
           3. Run: ./install.sh
 
           Or install via pip:
-          pip install telemetryflow-sdk
+          pip install telemetryflow-python-sdk
 
           Available Commands:
           - telemetryflow-gen     - SDK code generator
@@ -488,7 +488,7 @@ jobs:
     if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_pypi == 'true') }}
     environment:
       name: pypi
-      url: https://pypi.org/p/telemetryflow-sdk
+      url: https://pypi.org/p/telemetryflow-python-sdk
     steps:
       - name: Download package
         uses: actions/download-artifact@v4
@@ -499,6 +499,7 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
           skip-existing: true
         continue-on-error: true
 
@@ -607,7 +608,7 @@ jobs:
 
             **Via pip (recommended):**
             ```bash
-            pip install telemetryflow-sdk==${{ needs.prepare.outputs.version }}
+            pip install telemetryflow-python-sdk==${{ needs.prepare.outputs.version }}
             ```
 
             ### Included Generators
