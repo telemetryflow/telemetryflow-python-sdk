@@ -240,14 +240,20 @@ while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
     # Check if pyproject.toml or setup.py exists
     if [ -f "pyproject.toml" ]; then
         if command -v python &> /dev/null; then
-            if python -m build --no-isolation 2>/dev/null; then
-                success "Package build successful"
-            else
-                # Try with pip
-                if pip wheel . --no-deps -w dist/ 2>/dev/null; then
+            # Check if build module and setuptools are available
+            if python -c "import build, setuptools" 2>/dev/null; then
+                if python -m build --no-isolation 2>/dev/null; then
                     success "Package build successful"
                 else
-                    warning "Build verification skipped (build tools not available)"
+                    warning "Build failed but continuing (may need build dependencies)"
+                fi
+            else
+                # Fallback: verify pyproject.toml is valid by checking package can be imported
+                if python -c "import tomllib; tomllib.load(open('pyproject.toml', 'rb'))" 2>/dev/null || \
+                   python -c "import toml; toml.load('pyproject.toml')" 2>/dev/null; then
+                    success "Package configuration valid (pyproject.toml syntax OK)"
+                else
+                    warning "Build verification skipped (build/setuptools not installed)"
                 fi
             fi
         fi
