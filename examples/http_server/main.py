@@ -118,9 +118,7 @@ class InstrumentedHandler(BaseHTTPRequestHandler):
 
         try:
             if self.path == "/":
-                self._send_json_response(
-                    {"message": "Welcome to TelemetryFlow HTTP Server!"}
-                )
+                self._send_json_response({"message": "Welcome to TelemetryFlow HTTP Server!"})
             elif self.path == "/api/users":
                 self._handle_users(span_id)
             elif self.path == "/api/orders":
@@ -188,7 +186,9 @@ class InstrumentedHandler(BaseHTTPRequestHandler):
         ]
 
         client.add_span_event(
-            parent_span_id, "orders_fetched", {"count": len(orders), "cached": cache_hit}
+            parent_span_id,
+            "orders_fetched",
+            {"count": len(orders), "cached": cache_hit},
         )
         self._send_json_response({"orders": orders})
 

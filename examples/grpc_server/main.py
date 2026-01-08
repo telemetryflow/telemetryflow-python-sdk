@@ -88,7 +88,7 @@ class GreeterServicer:
         """Initialize the servicer."""
         self._client = telemetry_client
 
-    def say_hello(self, name: str, context: ServicerContext) -> str:
+    def say_hello(self, name: str, _context: ServicerContext) -> str:
         """Handle SayHello RPC."""
         with self._client.span("grpc.handler.say_hello", SpanKind.INTERNAL) as span_id:
             self._client.log_info(
@@ -109,7 +109,7 @@ class GreeterServicer:
 
             return response
 
-    def say_goodbye(self, name: str, context: ServicerContext) -> str:
+    def say_goodbye(self, name: str, _context: ServicerContext) -> str:
         """Handle SayGoodbye RPC."""
         with self._client.span("grpc.handler.say_goodbye", SpanKind.INTERNAL) as span_id:
             self._client.log_info(
@@ -145,7 +145,7 @@ def main() -> None:
 
     # Create the gRPC server with telemetry interceptor
     interceptor = TelemetryInterceptor(client)
-    server = grpc.server(
+    _server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=10),
         interceptors=[interceptor],
     )
@@ -170,7 +170,7 @@ def main() -> None:
     # Simulate SayHello calls
     for name in ["Alice", "Bob", "Charlie"]:
         span_id = client.start_span(
-            f"gRPC /greeter.Greeter/SayHello",
+            "gRPC /greeter.Greeter/SayHello",
             SpanKind.SERVER,
             {"rpc.system": "grpc", "rpc.method": "/greeter.Greeter/SayHello"},
         )
@@ -202,7 +202,7 @@ def main() -> None:
     # Simulate SayGoodbye calls
     for name in ["Alice", "Bob"]:
         span_id = client.start_span(
-            f"gRPC /greeter.Greeter/SayGoodbye",
+            "gRPC /greeter.Greeter/SayGoodbye",
             SpanKind.SERVER,
             {"rpc.system": "grpc", "rpc.method": "/greeter.Greeter/SayGoodbye"},
         )

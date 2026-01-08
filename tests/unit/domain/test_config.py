@@ -4,7 +4,12 @@ from datetime import timedelta
 
 import pytest
 
-from telemetryflow.domain.config import ConfigError, Protocol, SignalType, TelemetryConfig
+from telemetryflow.domain.config import (
+    ConfigError,
+    Protocol,
+    SignalType,
+    TelemetryConfig,
+)
 from telemetryflow.domain.credentials import Credentials
 
 

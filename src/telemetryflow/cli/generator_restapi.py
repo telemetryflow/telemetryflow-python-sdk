@@ -819,7 +819,9 @@ def main(argv: list[str] | None = None) -> int:
     new_parser.add_argument("--version", dest="version", default="1.0.0", help="Service version")
     new_parser.add_argument("--environment", default="development", help="Environment")
     new_parser.add_argument(
-        "--db-driver", default="postgresql", help="Database driver (postgresql, mysql, sqlite)"
+        "--db-driver",
+        default="postgresql",
+        help="Database driver (postgresql, mysql, sqlite)",
     )
     new_parser.add_argument("--db-host", default="localhost", help="Database host")
     new_parser.add_argument("--db-port", default="5432", help="Database port")
@@ -845,7 +847,9 @@ def main(argv: list[str] | None = None) -> int:
         "-n", "--name", required=True, help="Entity name (e.g., User, Product)"
     )
     entity_parser.add_argument(
-        "-f", "--fields", help="Entity fields (e.g., 'name:string,email:string,age:int')"
+        "-f",
+        "--fields",
+        help="Entity fields (e.g., 'name:string,email:string,age:int')",
     )
     entity_parser.add_argument("-o", "--output", help="Project root directory")
     entity_parser.add_argument("--force", action="store_true", help="Overwrite existing files")

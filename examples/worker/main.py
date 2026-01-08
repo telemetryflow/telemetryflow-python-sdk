@@ -116,12 +116,10 @@ class Worker:
                     f"Job {job.id} failed: {e}",
                     {"job_type": job.type, "duration_s": duration},
                 )
-                self.client.add_span_event(
-                    span_id, "job_failed", {"error": str(e)}
-                )
+                self.client.add_span_event(span_id, "job_failed", {"error": str(e)})
                 raise
 
-    def _process_email_job(self, job: Job, parent_span_id: str) -> None:
+    def _process_email_job(self, job: Job, _parent_span_id: str) -> None:
         """Process an email job."""
         with self.client.span("email.send", SpanKind.CLIENT) as span_id:
             # Simulate email sending
@@ -135,7 +133,7 @@ class Worker:
                 },
             )
 
-    def _process_notification_job(self, job: Job, parent_span_id: str) -> None:
+    def _process_notification_job(self, job: Job, _parent_span_id: str) -> None:
         """Process a notification job."""
         with self.client.span("notification.push", SpanKind.CLIENT) as span_id:
             # Simulate push notification
@@ -149,7 +147,7 @@ class Worker:
                 },
             )
 
-    def _process_report_job(self, job: Job, parent_span_id: str) -> None:
+    def _process_report_job(self, job: Job, _parent_span_id: str) -> None:
         """Process a report generation job."""
         # Database query
         with self.client.span("database.query", SpanKind.CLIENT) as span_id:
@@ -174,7 +172,9 @@ class Worker:
         """Process a generic job."""
         time.sleep(random.uniform(0.1, 0.3))
         self.client.add_span_event(
-            parent_span_id, "generic_processing_complete", {"payload_keys": list(job.payload.keys())}
+            parent_span_id,
+            "generic_processing_complete",
+            {"payload_keys": list(job.payload.keys())},
         )
 
     def run(self) -> None:
@@ -243,13 +243,38 @@ def main() -> None:
 
     # Submit sample jobs
     sample_jobs = [
-        Job("job-001", "email", {"to": "user@example.com", "subject": "Welcome!"}, datetime.now()),
-        Job("job-002", "notification", {"channel": "mobile", "user_id": "user-123"}, datetime.now()),
-        Job("job-003", "report", {"format": "pdf", "report_type": "sales"}, datetime.now()),
-        Job("job-004", "email", {"to": "admin@example.com", "subject": "Alert"}, datetime.now()),
+        Job(
+            "job-001",
+            "email",
+            {"to": "user@example.com", "subject": "Welcome!"},
+            datetime.now(),
+        ),
+        Job(
+            "job-002",
+            "notification",
+            {"channel": "mobile", "user_id": "user-123"},
+            datetime.now(),
+        ),
+        Job(
+            "job-003",
+            "report",
+            {"format": "pdf", "report_type": "sales"},
+            datetime.now(),
+        ),
+        Job(
+            "job-004",
+            "email",
+            {"to": "admin@example.com", "subject": "Alert"},
+            datetime.now(),
+        ),
         Job("job-005", "generic", {"data": "test"}, datetime.now()),
         Job("job-006", "error", {}, datetime.now()),  # This will fail
-        Job("job-007", "notification", {"channel": "email", "user_id": "user-456"}, datetime.now()),
+        Job(
+            "job-007",
+            "notification",
+            {"channel": "email", "user_id": "user-456"},
+            datetime.now(),
+        ),
     ]
 
     for job in sample_jobs:

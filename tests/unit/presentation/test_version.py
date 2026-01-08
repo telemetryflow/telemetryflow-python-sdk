@@ -1,6 +1,13 @@
 """Unit tests for version utilities."""
 
-from telemetryflow.version import __version__, full, info, platform_info, python_version, short
+from telemetryflow.version import (
+    __version__,
+    full,
+    info,
+    platform_info,
+    python_version,
+    short,
+)
 
 
 class TestVersion:

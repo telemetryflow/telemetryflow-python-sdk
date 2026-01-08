@@ -182,7 +182,9 @@ class TelemetryFlowInstrumentor:
 
         try:
             if self._results.get("sqlalchemy"):
-                from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+                from opentelemetry.instrumentation.sqlalchemy import (
+                    SQLAlchemyInstrumentor,
+                )
 
                 SQLAlchemyInstrumentor().uninstrument()
         except Exception:

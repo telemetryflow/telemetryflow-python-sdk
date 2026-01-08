@@ -51,10 +51,22 @@ echo ""
 # ==============================================================================
 info "Checking for sensitive files..."
 
-SENSITIVE_PATTERNS=".env .env.local .env.production credentials secrets private"
-for pattern in $SENSITIVE_PATTERNS; do
-    if echo "$STAGED_FILES" | grep -qE "(^|/)$pattern"; then
+# Sensitive file patterns (exact matches, not partial)
+# Note: credentials.py, secrets.py etc. are allowed as they are source code files
+SENSITIVE_FILES=".env .env.local .env.production .env.development credentials.json secrets.json private.key"
+for pattern in $SENSITIVE_FILES; do
+    if echo "$STAGED_FILES" | grep -qE "(^|/)${pattern}$"; then
         error "Sensitive file detected: $pattern"
+        error "Remove it from staging: git reset HEAD <file>"
+        exit 1
+    fi
+done
+
+# Also check for directories that shouldn't be committed
+SENSITIVE_DIRS="credentials/ secrets/ private/"
+for dir in $SENSITIVE_DIRS; do
+    if echo "$STAGED_FILES" | grep -qE "(^|/)${dir}"; then
+        error "Sensitive directory detected: $dir"
         error "Remove it from staging: git reset HEAD <file>"
         exit 1
     fi
@@ -157,11 +169,18 @@ if [ -n "$STAGED_PY_FILES" ]; then
     if command -v mypy &> /dev/null; then
         info "Running MyPy type checking..."
 
-        if mypy $STAGED_PY_FILES 2>/dev/null; then
-            success "MyPy type checking passed"
+        # Filter out examples/ and tests/ directories (consistent with pyproject.toml)
+        SRC_PY_FILES=$(echo "$STAGED_PY_FILES" | grep -v "^examples/" | grep -v "^tests/" || true)
+
+        if [ -n "$SRC_PY_FILES" ]; then
+            if mypy $SRC_PY_FILES 2>/dev/null; then
+                success "MyPy type checking passed"
+            else
+                error "MyPy found type errors. Please fix them before committing."
+                exit 1
+            fi
         else
-            error "MyPy found type errors. Please fix them before committing."
-            exit 1
+            info "No source files to type check (examples/tests excluded)"
         fi
         echo ""
     else

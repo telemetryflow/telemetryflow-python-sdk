@@ -7,7 +7,10 @@ import pytest
 from telemetryflow.client import TelemetryFlowClient
 from telemetryflow.domain.config import TelemetryConfig
 from telemetryflow.domain.credentials import Credentials
-from telemetryflow.middleware.fastapi import FastAPITelemetryMiddleware, create_fastapi_middleware
+from telemetryflow.middleware.fastapi import (
+    FastAPITelemetryMiddleware,
+    create_fastapi_middleware,
+)
 
 
 @pytest.fixture
