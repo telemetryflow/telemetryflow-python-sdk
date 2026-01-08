@@ -84,6 +84,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
 
       - name: Install CI dependencies
         run: make ci-deps
@@ -115,6 +116,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
 
       - name: Install CI dependencies
         run: make ci-deps
@@ -149,6 +151,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
 
       - name: Install CI dependencies
         run: make ci-deps
@@ -183,6 +186,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
 
       - name: Install CI dependencies
         run: make ci-deps
@@ -212,6 +216,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
 
       - name: Install package (Unix)
         if: matrix.os != 'windows-latest'
@@ -280,6 +285,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
 
       - name: Install CI dependencies
         run: make ci-deps
@@ -311,6 +317,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
 
       - name: Install CI dependencies
         run: make ci-deps
