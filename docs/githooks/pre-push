@@ -144,11 +144,16 @@ while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
     if command -v mypy &> /dev/null; then
         info "Running MyPy type checking..."
 
-        if mypy . 2>/dev/null; then
-            success "MyPy type checking passed"
+        # Run mypy on src/ directory only (tests/examples excluded in pyproject.toml)
+        if [ -d "src" ]; then
+            if mypy src/ 2>/dev/null; then
+                success "MyPy type checking passed"
+            else
+                error "MyPy type checking failed. Please fix all type errors before pushing."
+                exit 1
+            fi
         else
-            error "MyPy type checking failed. Please fix all type errors before pushing."
-            exit 1
+            info "No src/ directory found, skipping type checking"
         fi
         echo ""
     else

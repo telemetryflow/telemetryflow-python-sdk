@@ -181,6 +181,16 @@ module = [
 ]
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = [
+    "flask",
+    "flask.*",
+    "starlette.*",
+    "fastapi",
+    "fastapi.*",
+]
+ignore_missing_imports = true
+
 [tool.ruff]
 target-version = "py312"
 line-length = 100
