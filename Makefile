@@ -410,7 +410,7 @@ ci-build: clean
 ci-security:
 	@echo "$(GREEN)Running security scan (CI mode)...$(NC)"
 	@$(PIP) install bandit bandit-sarif-formatter safety 2>/dev/null || true
-	@bandit -r $(SRC_DIR)/ --format sarif --output bandit-results.sarif || true
+	@bandit -r $(SRC_DIR)/ --format sarif --output bandit-results.sarif -ll || true
 	@safety check --json > safety-results.json 2>/dev/null || true
 	@echo "$(GREEN)Security scan complete$(NC)"
 
