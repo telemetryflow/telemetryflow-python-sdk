@@ -1,16 +1,16 @@
 # TelemetryFlow Python SDK - Makefile
 #
 # TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
-# Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+# Copyright (c) 2024-2026 Telemetri Data Indonesia. All rights reserved.
 #
 # Build and development commands for TelemetryFlow Python SDK
 
 # Build configuration
 PRODUCT_NAME := TelemetryFlow Python SDK
-VERSION ?= 1.1.2
-TFO_COLLECTOR_VERSION := 1.1.2
+VERSION ?= 1.2.0
+TFO_COLLECTOR_VERSION := 1.2.1
 OTEL_VERSION := 0.142.0
-OTEL_PYTHON_SDK_VERSION := 1.29.0
+OTEL_PYTHON_SDK_VERSION := 1.42.1
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
 BUILD_TIME := $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')

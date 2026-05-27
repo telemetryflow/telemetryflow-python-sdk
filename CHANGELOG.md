@@ -7,11 +7,11 @@
 
   <h3>TelemetryFlow Python SDK</h3>
 
-[![Version](https://img.shields.io/badge/Version-1.1.2-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.2.0-orange.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://python.org)
 [![PyPI](https://img.shields.io/pypi/v/telemetryflow-python-sdk?logo=python&logoColor=white&label=PyPI)](https://pypi.org/project/telemetryflow-python-sdk/)
-[![OTEL SDK](https://img.shields.io/badge/OpenTelemetry_SDK-1.28.0-blueviolet)](https://opentelemetry.io/)
+[![OTEL SDK](https://img.shields.io/badge/OpenTelemetry_SDK-1.42.1-blueviolet)](https://opentelemetry.io/)
 [![OpenTelemetry](https://img.shields.io/badge/OTLP-100%25%20Compliant-success?logo=opentelemetry)](https://opentelemetry.io/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)](https://hub.docker.com/r/telemetryflow/telemetryflow-python-sdk)
 
@@ -25,13 +25,34 @@
 
 # Changelog
 
-
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.2] - 2025-01-04
+## [1.2.0] - 2025-05-27
+
+### Added
+
+- **Dependabot Configuration**: Added `.github/dependabot.yml` for automated dependency updates (pip, docker, github-actions ecosystems)
+
+### Changed
+
+- **OpenTelemetry SDK Dependency**: Upgraded minimum OTEL SDK from `>=1.28.0` to `>=1.42.1` in `pyproject.toml`
+- **OpenTelemetry Instrumentation**: Upgraded minimum instrumentation from `>=0.49b0` to `>=0.63b1` in `pyproject.toml`
+- **GitHub Actions CI/CD**: Upgraded all workflow action versions
+  - `actions/checkout` v4 → v6
+  - `actions/upload-artifact` v4 → v7
+  - `actions/download-artifact` v4 → v8
+  - `docker/metadata-action` v5 → v6
+  - `docker/setup-qemu-action` v3 → v4
+  - `docker/setup-buildx-action` v3 → v4
+  - `docker/login-action` v3 → v4
+  - `docker/build-push-action` v6 → v7
+  - `softprops/action-gh-release` v2 → v3
+- **TFO-Collector Version**: Updated CI reference from v1.1.2 to v1.2.1
+- **Docker Compose**: Removed Grafana and Jaeger services; added TFO Platform services (tfo-backend, tfo-viz, postgres, clickhouse, redis, nats) under `platform` profile
+- **File Headers**: Refactored all 66 Python source files to standard Apache 2.0 license header format
 
 ### Added
 
@@ -39,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **gRPC Header Lowercase Support**: Added `_get_grpc_headers()` method in `OTLPExporterFactory` to ensure gRPC metadata keys are lowercase (required by gRPC specification)
 - **Comprehensive Unit Tests**: Added `TestGetGrpcHeaders` test class for gRPC header handling
 
-- **TFO v2 API Configuration Alignment**: Updated SDK configuration to align with TFO-Collector v1.1.2 (OCB-native)
+- **TFO v2 API Configuration Alignment**: Updated SDK configuration to align with TFO-Collector v1.2.1
   - Added `v2_api` configuration section with `enabled` and `v2_only` options
   - Added custom endpoint paths support (`traces_endpoint`, `metrics_endpoint`, `logs_endpoint`)
   - Aligned with `tfoexporter` component for consistent API versioning
@@ -79,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **CI Python Version Matrix**: Updated CI workflow to test on Python 3.12 and 3.13 only (aligned with `requires-python = ">=3.12"`)
-- Updated version to 1.1.2 to align with TFO-Collector v1.1.2 release
+- Updated version to 1.2.0 to align with TFO-Collector v1.2.1 release
 - Default endpoint changed from `api.telemetryflow.id:4317` to `localhost:4317` for development
 - Added `TELEMETRYFLOW_PROTOCOL` and `TELEMETRYFLOW_TIMEOUT` environment variables
 
@@ -105,7 +126,7 @@ collector:
   datacenter: "default"
   enrich_resources: true
   tags:
-    sdk_version: "1.1.2"
+    sdk_version: "1.2.0"
     sdk_language: "python"
 ```
 
@@ -167,6 +188,7 @@ templates/
 ## [1.1.0] - 2024-12-29
 
 ### Added
+
 - Initial release of TelemetryFlow Python SDK
 - Full OpenTelemetry support with OTLP export
 - Metrics support (counter, gauge, histogram)
@@ -183,6 +205,7 @@ templates/
 - DDD architecture with CQRS pattern
 
 ### Features
+
 - `TelemetryFlowClient` - Main SDK client
 - `TelemetryFlowBuilder` - Fluent configuration builder
 - `Credentials` - Immutable API key value object
@@ -194,12 +217,14 @@ templates/
 - Custom resource attributes
 
 ### Documentation
+
 - Comprehensive README with examples
 - API reference documentation
 - Integration guides
 - Example applications (basic, HTTP server, worker, gRPC)
 
 ### Planned
+
 - AsyncIO support
 - Django middleware
 - Batch log emission

@@ -3,7 +3,7 @@
 # =============================================================================
 #
 # TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
-# Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+# Copyright (c) 2024-2026 Telemetri Data Indonesia. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ LABEL org.opencontainers.image.title="TelemetryFlow Python SDK" \
       org.opencontainers.image.description="Python SDK and code generators for TelemetryFlow integration - Community Enterprise Observability Platform (CEOP)" \
       org.opencontainers.image.version="1.1.1" \
       org.opencontainers.image.vendor="TelemetryFlow" \
-      org.opencontainers.image.authors="DevOpsCorner Indonesia <support@devopscorner.id>" \
+      org.opencontainers.image.authors="Telemetri Data Indonesia <support@devopscorner.id>" \
       org.opencontainers.image.url="https://telemetryflow.id" \
       org.opencontainers.image.documentation="https://docs.telemetryflow.id" \
       org.opencontainers.image.source="https://github.com/telemetryflow/telemetryflow-python-sdk" \
@@ -80,7 +80,7 @@ LABEL org.opencontainers.image.title="TelemetryFlow Python SDK" \
       io.telemetryflow.product="TelemetryFlow Python SDK" \
       io.telemetryflow.component="telemetryflow-python-sdk" \
       io.telemetryflow.platform="CEOP" \
-      io.telemetryflow.maintainer="DevOpsCorner Indonesia"
+      io.telemetryflow.maintainer="Telemetri Data Indonesia"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \

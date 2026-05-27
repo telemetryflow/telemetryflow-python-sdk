@@ -1,29 +1,20 @@
 """TelemetryFlow Auto-Instrumentation Module.
 
-This module provides auto-instrumentation capabilities for common Python frameworks
-and libraries, allowing automatic collection of traces, metrics, and logs without
-manual code changes.
+TelemetryFlow Python SDK - Community Enterprise Observability Platform
+Copyright (c) 2024-2026 Telemetri Data Indonesia. All rights reserved.
+Open Source Software built by Telemetri Data Indonesia.
 
-Usage:
-    from telemetryflow import TelemetryFlowBuilder
-    from telemetryflow.instrumentation import auto_instrument
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-    # Initialize TelemetryFlow
-    client = TelemetryFlowBuilder().with_auto_configuration().build()
-    client.initialize()
+    http://www.apache.org/licenses/LICENSE-2.0
 
-    # Enable auto-instrumentation for all supported libraries
-    auto_instrument()
-
-    # Or selectively instrument specific libraries
-    from telemetryflow.instrumentation import (
-        instrument_flask,
-        instrument_fastapi,
-        instrument_sqlalchemy,
-        instrument_requests,
-    )
-    instrument_flask()
-    instrument_requests()
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from __future__ import annotations

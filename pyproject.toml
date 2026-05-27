@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telemetryflow-python-sdk"
-version = "1.1.2"
+version = "1.2.0"
 description = "TelemetryFlow Python SDK - OpenTelemetry-based observability SDK for metrics, logs, and traces"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -41,11 +41,11 @@ classifiers = [
 ]
 
 dependencies = [
-    "opentelemetry-api>=1.28.0",
-    "opentelemetry-sdk>=1.28.0",
-    "opentelemetry-exporter-otlp-proto-grpc>=1.28.0",
-    "opentelemetry-exporter-otlp-proto-http>=1.28.0",
-    "opentelemetry-semantic-conventions>=0.49b0",
+    "opentelemetry-api>=1.42.1",
+    "opentelemetry-sdk>=1.42.1",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.42.1",
+    "opentelemetry-exporter-otlp-proto-http>=1.42.1",
+    "opentelemetry-semantic-conventions>=0.63b1",
 ]
 
 [project.optional-dependencies]
@@ -81,15 +81,15 @@ restapi = [
     "python-dotenv>=1.0.0",
 ]
 instrumentation = [
-    "opentelemetry-instrumentation>=0.49b0",
-    "opentelemetry-instrumentation-flask>=0.49b0",
-    "opentelemetry-instrumentation-fastapi>=0.49b0",
-    "opentelemetry-instrumentation-sqlalchemy>=0.49b0",
-    "opentelemetry-instrumentation-requests>=0.49b0",
-    "opentelemetry-instrumentation-httpx>=0.49b0",
-    "opentelemetry-instrumentation-logging>=0.49b0",
-    "opentelemetry-instrumentation-psycopg2>=0.49b0",
-    "opentelemetry-instrumentation-redis>=0.49b0",
+    "opentelemetry-instrumentation>=0.63b1",
+    "opentelemetry-instrumentation-flask>=0.63b1",
+    "opentelemetry-instrumentation-fastapi>=0.63b1",
+    "opentelemetry-instrumentation-sqlalchemy>=0.63b1",
+    "opentelemetry-instrumentation-requests>=0.63b1",
+    "opentelemetry-instrumentation-httpx>=0.63b1",
+    "opentelemetry-instrumentation-logging>=0.63b1",
+    "opentelemetry-instrumentation-psycopg2>=0.63b1",
+    "opentelemetry-instrumentation-redis>=0.63b1",
 ]
 all = [
     "telemetryflow-python-sdk[http,grpc,restapi,instrumentation]",

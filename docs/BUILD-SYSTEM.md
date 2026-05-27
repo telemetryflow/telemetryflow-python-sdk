@@ -331,9 +331,9 @@ make build
 ```
 
 Creates:
+- `dist/telemetryflow_python_sdk-1.2.0-py3-none-any.whl`
 
-- `dist/telemetryflow_python_sdk-1.1.2-py3-none-any.whl`
-- `dist/telemetryflow_python_sdk-1.1.2.tar.gz`
+- `dist/telemetryflow_python_sdk-1.2.0.tar.gz`
 
 #### make clean
 
@@ -509,18 +509,18 @@ ls -la dist/
 
 ```
 dist/
-├── telemetryflow_python_sdk-1.1.2-py3-none-any.whl  # Wheel (binary)
-└── telemetryflow_python_sdk-1.1.2.tar.gz            # Source distribution
+├── telemetryflow_python_sdk-1.2.0-py3-none-any.whl  # Wheel (binary)
+└── telemetryflow_python_sdk-1.2.0.tar.gz            # Source distribution
 ```
 
 ### Installing Built Package
 
 ```bash
 # Install wheel
-pip install dist/telemetryflow_python_sdk-1.1.2-py3-none-any.whl
+pip install dist/telemetryflow_python_sdk-1.2.0-py3-none-any.whl
 
 # Install from source
-pip install dist/telemetryflow_python_sdk-1.1.2.tar.gz
+pip install dist/telemetryflow_python_sdk-1.2.0.tar.gz
 ```
 
 ## Publishing
@@ -681,7 +681,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telemetryflow-python-sdk"
-version = "1.1.2"
+version = "1.2.0"
 requires-python = ">=3.12"
 
 [tool.pytest.ini_options]

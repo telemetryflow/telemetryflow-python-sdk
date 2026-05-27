@@ -3,7 +3,7 @@
 # =============================================================================
 #
 # TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
-# Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+# Copyright (c) 2024-2026 Telemetri Data Indonesia. All rights reserved.
 #
 # This workflow builds and releases TelemetryFlow Python SDK:
 # - PyPI package distribution
@@ -42,7 +42,7 @@ on:
 env:
   PYTHON_VERSION: '3.12'
   PRODUCT_NAME: TelemetryFlow Python SDK
-  VENDOR: DevOpsCorner Indonesia
+  VENDOR: Telemetri Data Indonesia
   MAINTAINER: support@telemetryflow.id
   DESCRIPTION: Enterprise-grade Python SDK for TelemetryFlow - the observability platform that provides unified metrics, logs, and traces collection following OpenTelemetry standards.
   LICENSE: Apache-2.0
@@ -67,7 +67,7 @@ jobs:
       build_time: ${{ steps.version.outputs.build_time }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -93,7 +93,7 @@ jobs:
     needs: prepare
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -112,7 +112,7 @@ jobs:
         run: twine check dist/*
 
       - name: Upload package artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-package
           path: dist/
@@ -146,7 +146,7 @@ jobs:
             runner: windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -190,7 +190,7 @@ jobs:
             src/telemetryflow/cli/generator_restapi.py
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: binaries-${{ matrix.os }}-${{ matrix.arch }}
           path: dist/
@@ -208,10 +208,10 @@ jobs:
         arch: [amd64]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download binaries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: binaries-linux-${{ matrix.arch }}
           path: dist
@@ -277,7 +277,7 @@ jobs:
           mv ${PKG_DIR}.deb packages/
 
       - name: Upload DEB artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: deb-${{ matrix.arch }}
           path: packages/*.deb
@@ -292,10 +292,10 @@ jobs:
     needs: [prepare, build-standalone]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download binaries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: binaries-windows-amd64
           path: dist
@@ -376,14 +376,14 @@ jobs:
           Documentation: https://docs.telemetryflow.id
           Support: support@telemetryflow.id
 
-          Copyright (c) 2024-2026 DevOpsCorner Indonesia
+          Copyright (c) 2024-2026 Telemetri Data Indonesia
           EOF
 
           # Create ZIP
           zip -r telemetryflow-python-sdk-${VERSION}-windows-amd64.zip ${PKG_DIR}
 
       - name: Upload Windows artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-amd64
           path: telemetryflow-python-sdk-*.zip
@@ -406,10 +406,10 @@ jobs:
             display_name: Apple Silicon
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download binaries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: binaries-darwin-${{ matrix.arch }}
           path: dist
@@ -465,14 +465,14 @@ jobs:
           Documentation: https://docs.telemetryflow.id
           Support: support@telemetryflow.id
 
-          Copyright (c) 2024-2026 DevOpsCorner Indonesia
+          Copyright (c) 2024-2026 Telemetri Data Indonesia
           EOF
 
           # Create tarball
           tar -czvf telemetryflow-python-sdk-${VERSION}-darwin-${{ matrix.arch }}.tar.gz ${PKG_DIR}
 
       - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: macos-${{ matrix.arch }}
           path: telemetryflow-python-sdk-*.tar.gz
@@ -491,7 +491,7 @@ jobs:
       url: https://pypi.org/p/telemetryflow-python-sdk
     steps:
       - name: Download package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-package
           path: dist/
@@ -517,18 +517,18 @@ jobs:
       - package-macos
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Download Python package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-package
           path: artifacts/pypi
 
       - name: Download DEB packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: deb-*
           path: artifacts/deb
@@ -536,7 +536,7 @@ jobs:
         continue-on-error: true
 
       - name: Download Windows packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: windows-*
           path: artifacts/windows
@@ -544,7 +544,7 @@ jobs:
         continue-on-error: true
 
       - name: Download macOS packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: macos-*
           path: artifacts/macos
@@ -592,7 +592,7 @@ jobs:
           fi
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: "${{ env.PRODUCT_NAME }} v${{ needs.prepare.outputs.version }}"
           tag_name: "v${{ needs.prepare.outputs.version }}"
