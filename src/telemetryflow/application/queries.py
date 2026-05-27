@@ -21,11 +21,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Protocol
 
 
-class HealthStatus(str, Enum):
+class HealthStatus(StrEnum):
     """Health status values."""
 
     HEALTHY = "healthy"

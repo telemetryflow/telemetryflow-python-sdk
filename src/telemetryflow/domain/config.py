@@ -22,7 +22,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from datetime import timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from telemetryflow.domain.credentials import Credentials
@@ -35,14 +35,14 @@ _ENDPOINT_PATTERN = re.compile(
 )
 
 
-class Protocol(str, Enum):
+class Protocol(StrEnum):
     """OTLP protocol type."""
 
     GRPC = "grpc"
     HTTP = "http"
 
 
-class SignalType(str, Enum):
+class SignalType(StrEnum):
     """Telemetry signal type."""
 
     METRICS = "metrics"

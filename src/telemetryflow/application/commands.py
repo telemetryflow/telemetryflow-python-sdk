@@ -21,13 +21,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Protocol
 
 from telemetryflow.domain.config import TelemetryConfig
 
 
-class SeverityLevel(str, Enum):
+class SeverityLevel(StrEnum):
     """Log severity levels."""
 
     TRACE = "trace"
@@ -38,7 +38,7 @@ class SeverityLevel(str, Enum):
     FATAL = "fatal"
 
 
-class SpanKind(str, Enum):
+class SpanKind(StrEnum):
     """Span kind for traces."""
 
     INTERNAL = "internal"
