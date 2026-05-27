@@ -1,15 +1,20 @@
-"""
-TelemetryFlow Python SDK - OpenTelemetry-based observability SDK.
+"""TelemetryFlow Python SDK - OpenTelemetry-based observability SDK.
 
-This SDK provides a simple and intuitive interface for instrumenting your
-Python applications with metrics, logs, and traces using OpenTelemetry.
+TelemetryFlow Python SDK - Community Enterprise Observability Platform
+Copyright (c) 2024-2026 Telemetri Data Indonesia. All rights reserved.
+Open Source Software built by Telemetri Data Indonesia.
 
-Features:
-    - Automatic configuration from environment variables
-    - Support for traces, metrics, and logs
-    - Auto-instrumentation for popular frameworks (Flask, FastAPI, SQLAlchemy, etc.)
-    - CQRS-based architecture for clean separation of concerns
-    - Full OpenTelemetry compatibility
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from typing import Any

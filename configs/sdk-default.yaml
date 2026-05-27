@@ -1,8 +1,8 @@
 # =============================================================================
 # TelemetryFlow Python SDK - Default Configuration
 # =============================================================================
-# This is the default SDK configuration for TelemetryFlow Python SDK v1.1.2
-# Compatible with TFO-Collector v1.1.2 (OCB-native)
+# This is the default SDK configuration for TelemetryFlow Python SDK v1.2.0
+# Compatible with TFO-Collector v1.2.1
 #
 # Usage in Python:
 #   from telemetryflow import TelemetryFlowBuilder
@@ -15,8 +15,8 @@
 # -----------------------------------------------------------------------------
 # SDK Version Info
 # -----------------------------------------------------------------------------
-version: "1.1.2"
-tfo_collector_version: "1.1.2"
+version: "1.2.0"
+tfo_collector_version: "1.2.1"
 otel_version: "1.28.0"
 
 # -----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ collector:
 
   # Custom tags for collector identification
   tags:
-    sdk_version: "1.1.2"
+    sdk_version: "1.2.0"
     sdk_language: "python"
     # environment: "production"
     # team: "platform"

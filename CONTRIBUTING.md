@@ -7,11 +7,11 @@
 
   <h3>TelemetryFlow Python SDK</h3>
 
-[![Version](https://img.shields.io/badge/Version-1.1.2-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.2.0-orange.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://python.org)
 [![PyPI](https://img.shields.io/pypi/v/telemetryflow-python-sdk?logo=python&logoColor=white&label=PyPI)](https://pypi.org/project/telemetryflow-python-sdk/)
-[![OTEL SDK](https://img.shields.io/badge/OpenTelemetry_SDK-1.28.0-blueviolet)](https://opentelemetry.io/)
+[![OTEL SDK](https://img.shields.io/badge/OpenTelemetry_SDK-1.42.1-blueviolet)](https://opentelemetry.io/)
 [![OpenTelemetry](https://img.shields.io/badge/OTLP-100%25%20Compliant-success?logo=opentelemetry)](https://opentelemetry.io/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)](https://hub.docker.com/r/telemetryflow/telemetryflow-python-sdk)
 
@@ -167,13 +167,13 @@ telemetryflow-python-sdk/
 
 ### Layer Responsibilities
 
-| Layer | Responsibility | Dependencies |
-|-------|---------------|--------------|
-| **Domain** | Business logic, entities, value objects | None (pure Python) |
-| **Application** | Use cases, commands, queries | Domain only |
-| **Infrastructure** | Technical implementations, exporters | Domain, Application |
-| **Interface** | Public API (Client, Builder) | All layers |
-| **CLI** | Code generators | All layers |
+| Layer              | Responsibility                          | Dependencies        |
+| ------------------ | --------------------------------------- | ------------------- |
+| **Domain**         | Business logic, entities, value objects | None (pure Python)  |
+| **Application**    | Use cases, commands, queries            | Domain only         |
+| **Infrastructure** | Technical implementations, exporters    | Domain, Application |
+| **Interface**      | Public API (Client, Builder)            | All layers          |
+| **CLI**            | Code generators                         | All layers          |
 
 ## Making Changes
 
@@ -211,6 +211,7 @@ Fixes #123
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -358,13 +359,13 @@ Follow PEP 8 and modern Python conventions:
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Modules | lowercase, underscores | `domain`, `application` |
-| Classes | PascalCase | `TelemetryConfig`, `Credentials` |
-| Functions | snake_case | `new_credentials`, `handle_command` |
-| Constants | UPPER_SNAKE_CASE | `PROTOCOL_GRPC`, `SIGNAL_METRICS` |
-| Private | leading underscore | `_validate_config`, `_internal_state` |
+| Type      | Convention             | Example                               |
+| --------- | ---------------------- | ------------------------------------- |
+| Modules   | lowercase, underscores | `domain`, `application`               |
+| Classes   | PascalCase             | `TelemetryConfig`, `Credentials`      |
+| Functions | snake_case             | `new_credentials`, `handle_command`   |
+| Constants | UPPER_SNAKE_CASE       | `PROTOCOL_GRPC`, `SIGNAL_METRICS`     |
+| Private   | leading underscore     | `_validate_config`, `_internal_state` |
 
 ### Error Handling
 
@@ -511,11 +512,11 @@ Releases follow semantic versioning (SemVer):
 
 The project uses GitHub Actions for CI/CD:
 
-| Workflow       | Trigger           | Purpose                                 |
-| -------------- | ----------------- | --------------------------------------- |
-| `ci.yml`       | Push/PR           | Lint, test, build verification          |
-| `docker.yml`   | Push to main/tags | Build Docker images                     |
-| `release.yml`  | Tags (v*.*.*)     | Publish to PyPI, create GitHub release  |
+| Workflow      | Trigger           | Purpose                                |
+| ------------- | ----------------- | -------------------------------------- |
+| `ci.yml`      | Push/PR           | Lint, test, build verification         |
+| `docker.yml`  | Push to main/tags | Build Docker images                    |
+| `release.yml` | Tags (v*.*.\*)    | Publish to PyPI, create GitHub release |
 
 ### Changelog
 
@@ -559,4 +560,4 @@ Thank you for contributing to TelemetryFlow Python SDK!
 
 ---
 
-Built with care by the **DevOpsCorner Indonesia** community
+Built with care by the **Telemetri Data Indonesia** community

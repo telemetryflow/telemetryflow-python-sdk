@@ -3,7 +3,7 @@
 # =============================================================================
 #
 # TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
-# Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+# Copyright (c) 2024-2026 Telemetri Data Indonesia. All rights reserved.
 #
 # This Dockerfile is optimized for development with hot-reloading,
 # debugging tools, and all development dependencies installed.
@@ -19,7 +19,7 @@ LABEL org.opencontainers.image.title="TelemetryFlow Python SDK - Development" \
       org.opencontainers.image.description="Development image for TelemetryFlow Python SDK" \
       org.opencontainers.image.version="1.1.1-dev" \
       org.opencontainers.image.vendor="TelemetryFlow" \
-      org.opencontainers.image.authors="DevOpsCorner Indonesia <support@devopscorner.id>" \
+      org.opencontainers.image.authors="Telemetri Data Indonesia <support@devopscorner.id>" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 # Set environment variables

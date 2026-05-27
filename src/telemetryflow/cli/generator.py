@@ -1,9 +1,20 @@
 """TelemetryFlow SDK Generator CLI.
 
-TelemetryFlow Python SDK - Community Enterprise Observability Platform (CEOP)
-Copyright (c) 2024-2026 DevOpsCorner Indonesia. All rights reserved.
+TelemetryFlow Python SDK - Community Enterprise Observability Platform
+Copyright (c) 2024-2026 Telemetri Data Indonesia. All rights reserved.
+Open Source Software built by Telemetri Data Indonesia.
 
-Generate boilerplate code for integrating TelemetryFlow into your Python application.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from __future__ import annotations
@@ -39,7 +50,7 @@ class TemplateData:
         enable_logs: bool = True,
         enable_traces: bool = True,
         port: str = "8080",
-        # TFO v2 API settings (aligned with TFO-Collector v1.1.2)
+        # TFO v2 API settings (aligned with TFO-Collector v1.2.1)
         use_v2_api: bool = True,
         v2_only: bool = False,
         collector_name: str = "TelemetryFlow Python SDK",
@@ -88,7 +99,7 @@ class TemplateData:
             "enrich_resources": str(self.enrich_resources).lower(),
             "protocol": self.protocol,
             "sdk_version": __version__,
-            "tfo_collector_version": "1.1.2",
+            "tfo_collector_version": "1.2.1",
         }
 
 

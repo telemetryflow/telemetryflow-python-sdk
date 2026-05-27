@@ -7,11 +7,11 @@
 
   <h3>TelemetryFlow Python SDK</h3>
 
-[![Version](https://img.shields.io/badge/Version-1.1.2-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.2.0-orange.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://python.org)
 [![PyPI](https://img.shields.io/pypi/v/telemetryflow-python-sdk?logo=python&logoColor=white&label=PyPI)](https://pypi.org/project/telemetryflow-python-sdk/)
-[![OTEL SDK](https://img.shields.io/badge/OpenTelemetry_SDK-1.28.0-blueviolet)](https://opentelemetry.io/)
+[![OTEL SDK](https://img.shields.io/badge/OpenTelemetry_SDK-1.42.1-blueviolet)](https://opentelemetry.io/)
 [![OpenTelemetry](https://img.shields.io/badge/OTLP-100%25%20Compliant-success?logo=opentelemetry)](https://opentelemetry.io/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)](https://hub.docker.com/r/telemetryflow/telemetryflow-python-sdk)
 
@@ -25,16 +25,16 @@
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| **100% OTLP Compliant** | Full OpenTelemetry Protocol support |
-| **DDD Architecture** | Domain-Driven Design with clean layers |
-| **CQRS Pattern** | Command Query Responsibility Segregation |
-| **Three Signals** | Metrics, Logs, and Traces |
-| **Multiple Protocols** | gRPC (default) and HTTP |
-| **Type Safety** | Full type hints with mypy support |
-| **Framework Integrations** | Flask, FastAPI middleware |
-| **CLI Generator** | Project scaffolding tool |
+| Feature                    | Description                              |
+| -------------------------- | ---------------------------------------- |
+| **100% OTLP Compliant**    | Full OpenTelemetry Protocol support      |
+| **DDD Architecture**       | Domain-Driven Design with clean layers   |
+| **CQRS Pattern**           | Command Query Responsibility Segregation |
+| **Three Signals**          | Metrics, Logs, and Traces                |
+| **Multiple Protocols**     | gRPC (default) and HTTP                  |
+| **Type Safety**            | Full type hints with mypy support        |
+| **Framework Integrations** | Flask, FastAPI middleware                |
+| **CLI Generator**          | Project scaffolding tool                 |
 
 ## Architecture
 
@@ -205,16 +205,16 @@ client = (
 
 ### Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `TELEMETRYFLOW_API_KEY_ID` | Yes | - | API key ID (tfk_*) |
-| `TELEMETRYFLOW_API_KEY_SECRET` | Yes | - | API key secret (tfs_*) |
-| `TELEMETRYFLOW_ENDPOINT` | No | api.telemetryflow.id:4317 | Collector endpoint |
-| `TELEMETRYFLOW_SERVICE_NAME` | Yes | - | Service name |
-| `TELEMETRYFLOW_SERVICE_VERSION` | No | 1.0.0 | Service version |
-| `TELEMETRYFLOW_SERVICE_NAMESPACE` | No | telemetryflow | Service namespace |
-| `TELEMETRYFLOW_ENVIRONMENT` | No | production | Environment |
-| `TELEMETRYFLOW_COLLECTOR_ID` | No | - | Collector ID |
+| Variable                          | Required | Default                   | Description              |
+| --------------------------------- | -------- | ------------------------- | ------------------------ |
+| `TELEMETRYFLOW_API_KEY_ID`        | Yes      | -                         | API key ID (tfk\_\*)     |
+| `TELEMETRYFLOW_API_KEY_SECRET`    | Yes      | -                         | API key secret (tfs\_\*) |
+| `TELEMETRYFLOW_ENDPOINT`          | No       | api.telemetryflow.id:4317 | Collector endpoint       |
+| `TELEMETRYFLOW_SERVICE_NAME`      | Yes      | -                         | Service name             |
+| `TELEMETRYFLOW_SERVICE_VERSION`   | No       | 1.0.0                     | Service version          |
+| `TELEMETRYFLOW_SERVICE_NAMESPACE` | No       | telemetryflow             | Service namespace        |
+| `TELEMETRYFLOW_ENVIRONMENT`       | No       | production                | Environment              |
+| `TELEMETRYFLOW_COLLECTOR_ID`      | No       | -                         | Collector ID             |
 
 ## API Reference
 
@@ -273,13 +273,13 @@ else:
 
 ### Span Kinds
 
-| Kind | Use Case |
-|------|----------|
+| Kind                | Use Case                      |
+| ------------------- | ----------------------------- |
 | `SpanKind.INTERNAL` | Internal operations (default) |
-| `SpanKind.SERVER` | Server-side request handling |
-| `SpanKind.CLIENT` | Client-side requests |
-| `SpanKind.PRODUCER` | Message queue producers |
-| `SpanKind.CONSUMER` | Message queue consumers |
+| `SpanKind.SERVER`   | Server-side request handling  |
+| `SpanKind.CLIENT`   | Client-side requests          |
+| `SpanKind.PRODUCER` | Message queue producers       |
+| `SpanKind.CONSUMER` | Message queue consumers       |
 
 ## Framework Integration
 
@@ -487,12 +487,12 @@ pytest --cov=telemetryflow --cov-report=html
 
 ## Testing Strategy
 
-| Layer | Target Coverage | Focus |
-|-------|-----------------|-------|
-| Domain | 90%+ | Value objects, validation |
-| Application | 85%+ | Commands, queries |
-| Infrastructure | 80%+ | Handlers, exporters |
-| Client | 85%+ | Public API |
+| Layer          | Target Coverage | Focus                     |
+| -------------- | --------------- | ------------------------- |
+| Domain         | 90%+            | Value objects, validation |
+| Application    | 85%+            | Commands, queries         |
+| Infrastructure | 80%+            | Handlers, exporters       |
+| Client         | 85%+            | Public API                |
 
 ## Best Practices
 
@@ -562,19 +562,19 @@ client.increment_counter("request", attributes={"url": full_url})
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [Quick Start](docs/QUICKSTART.md) | 5-minute setup guide |
-| [Architecture](docs/ARCHITECTURE.md) | DDD/CQRS design with diagrams |
-| [API Reference](docs/API_REFERENCE.md) | Complete API documentation |
-| [Generator](docs/GENERATOR.md) | CLI tool guide |
-| [Testing](docs/TESTING.md) | Testing best practices |
-| [Build System](docs/BUILD-SYSTEM.md) | Development workflow |
+| Document                               | Description                   |
+| -------------------------------------- | ----------------------------- |
+| [Quick Start](docs/QUICKSTART.md)      | 5-minute setup guide          |
+| [Architecture](docs/ARCHITECTURE.md)   | DDD/CQRS design with diagrams |
+| [API Reference](docs/API_REFERENCE.md) | Complete API documentation    |
+| [Generator](docs/GENERATOR.md)         | CLI tool guide                |
+| [Testing](docs/TESTING.md)             | Testing best practices        |
+| [Build System](docs/BUILD-SYSTEM.md)   | Development workflow          |
 
 ## Requirements
 
 - Python 3.12+
-- OpenTelemetry SDK 1.28.0+
+- OpenTelemetry SDK 1.42.1+
 
 ## License
 
