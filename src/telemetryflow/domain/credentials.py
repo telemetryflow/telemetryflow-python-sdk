@@ -87,7 +87,6 @@ class Credentials:
         return {
             "Authorization": self.authorization_header(),
             "X-TelemetryFlow-Key-ID": self.key_id,
-            "X-TelemetryFlow-Key-Secret": self.key_secret,
         }
 
     def equals(self, other: Credentials | None) -> bool:
@@ -106,8 +105,7 @@ class Credentials:
 
     def __str__(self) -> str:
         """Return a safe string representation (hides secret)."""
-        secret_preview = self.key_secret[:8] + "..." if len(self.key_secret) > 8 else "***"
-        return f"Credentials(key_id={self.key_id}, key_secret={secret_preview})"
+        return f"Credentials(key_id={self.key_id}, key_secret=***)"
 
     def __repr__(self) -> str:
         """Return a developer-friendly representation."""

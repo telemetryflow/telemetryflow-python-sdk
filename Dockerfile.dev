@@ -17,7 +17,7 @@ FROM python:3.14-slim
 # =============================================================================
 LABEL org.opencontainers.image.title="TelemetryFlow Python SDK - Development" \
       org.opencontainers.image.description="Development image for TelemetryFlow Python SDK" \
-      org.opencontainers.image.version="1.1.1-dev" \
+      org.opencontainers.image.version="1.2.0-dev" \
       org.opencontainers.image.vendor="TelemetryFlow" \
       org.opencontainers.image.authors="Telemetri Data Indonesia <support@devopscorner.id>" \
       org.opencontainers.image.licenses="Apache-2.0"
@@ -27,19 +27,26 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    # Development settings
     PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install system dependencies and upgrade ALL system packages to patch CVEs
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
     git \
     curl \
     wget \
     vim \
     ca-certificates \
     build-essential \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get remove -y --purge perl \
+    && apt-get autoremove -y --purge \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Create non-root user
+RUN groupadd -g 10001 telemetryflow && \
+    useradd -u 10001 -g telemetryflow -d /home/telemetryflow -m telemetryflow
 
 # Set working directory
 WORKDIR /app
@@ -48,7 +55,7 @@ WORKDIR /app
 COPY pyproject.toml README.md LICENSE ./
 COPY src/ ./src/
 
-# Install the package with all development dependencies
+# Install the package with all development dependencies (upgrade pip to fix CVEs)
 RUN pip install --upgrade pip && \
     pip install -e ".[dev,http,grpc]"
 
@@ -60,7 +67,10 @@ RUN pip install \
     httpx
 
 # Create workspace directory
-RUN mkdir -p /workspace
+RUN mkdir -p /workspace && chown -R telemetryflow:telemetryflow /workspace /app
+
+# Switch to non-root user
+USER telemetryflow
 
 # Set default command
 CMD ["python", "-c", "from telemetryflow import TelemetryFlowBuilder; print('TelemetryFlow Python SDK - Development Environment Ready!')"]

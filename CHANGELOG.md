@@ -107,6 +107,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **gRPC Header Case Sensitivity**: Fixed gRPC exporter to use lowercase header keys (gRPC metadata specification requires lowercase keys)
+- **Security - Credentials Exposure**: Removed partial API key secret leak in `Credentials.__str__()` — now masks secret completely with `***` instead of exposing first 8 characters
+- **Security - Plaintext Secret Header**: Removed `X-TelemetryFlow-Key-Secret` from `auth_headers()` — API key secret is now only transmitted via the `Authorization` header
+- **Security - Endpoint SSRF Validation**: Added regex-based `host:port` validation in `TelemetryConfig._validate()` to prevent Server-Side Request Forgery via malformed endpoints
+- **Security - Insecure TLS Warning**: Added `logging.warning()` when `with_insecure(True)` is called to alert developers that TLS is disabled
+- **Security - Hardcoded Secrets**: Removed all hardcoded default passwords from `docker-compose.yml` — PostgreSQL, ClickHouse, JWT, and session secrets now require explicit configuration via `${VAR:?msg}` pattern
+- **Security - CORS Wildcard**: Changed default `CORS_ORIGIN` from `*` to `http://localhost:8080` in `docker-compose.yml` and `.env.example`
+- **Security - Weak Defaults**: Removed weak default secrets (`change-me-in-production`, `telemetryflow123`) from `.env.example` — all secret fields now empty by default
+- **Security - Insecure Default**: Changed `TELEMETRYFLOW_INSECURE` default from `true` to `false` in `.env.example` with security warning
+- **Security - Docker Root User**: Added non-root `telemetryflow` user (UID 10001) to `Dockerfile.dev` with `USER` directive
+- **Security - Docker CVE Hardening**: Updated `Dockerfile`, `Dockerfile.dev`, and `docker.yml` workflow to patch Trivy-detected CVEs:
+  - `apt-get upgrade -y` to patch ncurses, glibc, util-linux, xz, zlib, tar, systemd, sqlite vulnerabilities
+  - Removed `perl` package to eliminate Archive::Tar, IO::Compress, IO::Uncompress::Unzip CVEs
+  - Upgraded `pip` to latest version to fix arbitrary code execution, path traversal, and improper archive handling
+- **Version Alignment (CVS)**: Fixed `version.py` from stale `1.1.1` to `1.2.0` matching `pyproject.toml` and `CHANGELOG.md`
+- **Version Alignment (CVS)**: Updated `Dockerfile` `ARG VERSION` and OCI labels from `1.1.1` to `1.2.0`
+- **Version Alignment (CVS)**: Updated `Dockerfile` build comments from `1.1.1` to `1.2.0`
 
 ### SDK Configuration Structure
 

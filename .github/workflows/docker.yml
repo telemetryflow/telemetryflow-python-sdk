@@ -179,7 +179,7 @@ jobs:
           # =============================================================================
           # TelemetryFlow Python SDK - Multi-stage Dockerfile
           # =============================================================================
-          FROM python:3.12-slim AS builder
+          FROM python:3.14-slim AS builder
 
           ARG VERSION=dev
           ARG GIT_COMMIT=unknown
@@ -187,8 +187,10 @@ jobs:
 
           WORKDIR /build
 
-          # Install build dependencies
-          RUN apt-get update && apt-get install -y --no-install-recommends \
+          # Install build dependencies and upgrade system packages to fix CVEs
+          RUN apt-get update && \
+              apt-get upgrade -y && \
+              apt-get install -y --no-install-recommends \
               git \
               && rm -rf /var/lib/apt/lists/*
 
@@ -196,20 +198,31 @@ jobs:
           COPY pyproject.toml README.md ./
           COPY src/ ./src/
 
-          # Build wheel
-          RUN pip install --no-cache-dir build && \
+          # Build wheel (upgrade pip to fix CVEs)
+          RUN pip install --upgrade pip build && \
               python -m build --wheel
 
           # =============================================================================
           # Final image
           # =============================================================================
-          FROM python:3.12-slim
+          FROM python:3.14-slim
 
           ARG VERSION=dev
 
-          # Install the built wheel
+          # Upgrade ALL system packages to patch CVEs (ncurses, glibc, util-linux, xz, zlib, tar, systemd, sqlite)
+          # Remove perl to eliminate Archive::Tar, IO::Compress CVEs
+          RUN apt-get update && \
+              apt-get upgrade -y && \
+              apt-get install -y --no-install-recommends \
+              ca-certificates \
+              && apt-get remove -y --purge perl \
+              && apt-get autoremove -y --purge \
+              && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+          # Install the built wheel (upgrade pip to fix CVEs)
           COPY --from=builder /build/dist/*.whl /tmp/
-          RUN pip install --no-cache-dir /tmp/*.whl && \
+          RUN pip install --upgrade pip && \
+              pip install --no-cache-dir /tmp/*.whl && \
               rm /tmp/*.whl
 
           # Labels

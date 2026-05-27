@@ -27,7 +27,7 @@
 FROM python:3.14-slim AS builder
 
 # Build arguments
-ARG VERSION=1.1.1
+ARG VERSION=1.2.0
 ARG GIT_COMMIT=unknown
 ARG GIT_BRANCH=unknown
 ARG BUILD_TIME=unknown
@@ -38,8 +38,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install build dependencies and upgrade all system packages to fix CVEs
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
@@ -68,14 +70,14 @@ FROM python:3.14-slim
 # =============================================================================
 LABEL org.opencontainers.image.title="TelemetryFlow Python SDK" \
       org.opencontainers.image.description="Python SDK and code generators for TelemetryFlow integration - Community Enterprise Observability Platform (CEOP)" \
-      org.opencontainers.image.version="1.1.1" \
+      org.opencontainers.image.version="1.2.0" \
       org.opencontainers.image.vendor="TelemetryFlow" \
       org.opencontainers.image.authors="Telemetri Data Indonesia <support@devopscorner.id>" \
       org.opencontainers.image.url="https://telemetryflow.id" \
       org.opencontainers.image.documentation="https://docs.telemetryflow.id" \
       org.opencontainers.image.source="https://github.com/telemetryflow/telemetryflow-python-sdk" \
       org.opencontainers.image.licenses="Apache-2.0" \
-      org.opencontainers.image.base.name="python:3.12-slim" \
+      org.opencontainers.image.base.name="python:3.14-slim" \
       # TelemetryFlow specific labels
       io.telemetryflow.product="TelemetryFlow Python SDK" \
       io.telemetryflow.component="telemetryflow-python-sdk" \
@@ -91,11 +93,25 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     TELEMETRYFLOW_ENDPOINT=api.telemetryflow.id:4317 \
     TELEMETRYFLOW_ENVIRONMENT=production
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install runtime dependencies and upgrade ALL system packages to patch CVEs:
+# - ncurses: buffer overflow (#80,#85,#93,#94)
+# - glibc: heap overflow, DNS crash, TSIG OOB write (#67-#74)
+# - util-linux: TOCTOU mount, hostname canonicalization (#75-#82,#87-#92)
+# - xz: buffer overflow in index decoding (#77)
+# - zlib: DoS via infinite loop in CRC32 (#106)
+# - tar: hidden file injection (#103)
+# - systemd: unintended terminal output (#84,#86)
+# - sqlite: info disclosure via crafted ZIP (#83)
+# - perl: heap overflow, Archive::Tar, IO::Compress (#95-#102)
+# - pip: arbitrary code execution, path traversal (#107-#109)
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get remove -y --purge perl \
+    && apt-get autoremove -y --purge \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Create non-root user and group
 RUN groupadd -g 10001 telemetryflow && \
@@ -108,8 +124,9 @@ RUN mkdir -p /workspace && chown -R telemetryflow:telemetryflow /workspace
 COPY --from=builder /wheels /wheels
 COPY --from=builder /build/dist/*.whl /wheels/
 
-# Install the SDK and dependencies
-RUN pip install --no-cache-dir /wheels/*.whl && \
+# Install the SDK and dependencies (upgrade pip to fix CVEs #107-#109)
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir /wheels/*.whl && \
     rm -rf /wheels
 
 # Verify installation
@@ -134,29 +151,29 @@ CMD ["--help"]
 # =============================================================================
 # Build with:
 #   docker build \
-#     --build-arg VERSION=1.1.1 \
+#     --build-arg VERSION=1.2.0 \
 #     --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) \
 #     --build-arg GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD) \
 #     --build-arg BUILD_TIME=$(date -u '+%Y-%m-%dT%H:%M:%SZ') \
-#     -t telemetryflow/telemetryflow-python-sdk:1.1.1 .
+#     -t telemetryflow/telemetryflow-python-sdk:1.2.0 .
 #
 # Run with:
 #   # SDK Generator (telemetryflow-gen) - Native Python integration
-#   docker run --rm -v $(pwd):/workspace telemetryflow/telemetryflow-python-sdk:1.1.1 \
+#   docker run --rm -v $(pwd):/workspace telemetryflow/telemetryflow-python-sdk:1.2.0 \
 #     init -p my-project --output /workspace
 #
 #   # RESTful API Generator (telemetryflow-restapi) - Flask + SQLAlchemy DDD project
 #   docker run --rm -v $(pwd):/workspace --entrypoint telemetryflow-restapi \
-#     telemetryflow/telemetryflow-python-sdk:1.1.1 \
+#     telemetryflow/telemetryflow-python-sdk:1.2.0 \
 #     new -n my-api --output /workspace
 #
 #   # Add entity to RESTful API project
 #   docker run --rm -v $(pwd)/my-api:/workspace --entrypoint telemetryflow-restapi \
-#     telemetryflow/telemetryflow-python-sdk:1.1.1 \
+#     telemetryflow/telemetryflow-python-sdk:1.2.0 \
 #     entity -n User -f 'name:string,email:string' --output /workspace
 #
 #   # Run Python example
 #   docker run --rm -v $(pwd):/workspace --entrypoint python \
-#     telemetryflow/telemetryflow-python-sdk:1.1.1 \
+#     telemetryflow/telemetryflow-python-sdk:1.2.0 \
 #     /workspace/example.py
 # =============================================================================

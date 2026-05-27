@@ -20,6 +20,7 @@ limitations under the License.
 from __future__ import annotations
 
 import contextlib
+import logging
 import os
 from datetime import timedelta
 from typing import TYPE_CHECKING
@@ -30,6 +31,8 @@ from telemetryflow.domain.credentials import Credentials, CredentialsError
 
 if TYPE_CHECKING:
     pass
+
+logger = logging.getLogger(__name__)
 
 
 class BuilderError(Exception):
@@ -325,6 +328,12 @@ class TelemetryFlowBuilder:
             Self for method chaining
         """
         self._insecure = insecure
+        if insecure:
+            logger.warning(
+                "TLS verification is DISABLED (insecure=true). "
+                "This should ONLY be used in development. "
+                "Never use this in production environments."
+            )
         return self
 
     # Signal Configuration

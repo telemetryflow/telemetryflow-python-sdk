@@ -274,7 +274,7 @@ services:
     environment:
       - TZ=${TZ:-UTC}
       - POSTGRES_USER=${POSTGRES_USERNAME:-tfo_admin}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-telemetryflow123}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
       - POSTGRES_DB=${POSTGRES_DB:-telemetryflow_db}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
@@ -305,7 +305,7 @@ services:
       - TZ=${TZ:-UTC}
       - CLICKHOUSE_DB=${CLICKHOUSE_DB:-telemetryflow_db}
       - CLICKHOUSE_USER=${CLICKHOUSE_USER:-tfo_admin}
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-telemetryflow123}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:?CLICKHOUSE_PASSWORD must be set}
     volumes:
       - ${DATA_CLICKHOUSE:-${VOLUMES_BASE_PATH:-/opt/data/docker/telemetryflow-sdk}/clickhouse}/data:/var/lib/clickhouse
       - ${DATA_CLICKHOUSE:-${VOLUMES_BASE_PATH:-/opt/data/docker/telemetryflow-sdk}/clickhouse}/logs:/var/log/clickhouse-server
@@ -396,14 +396,14 @@ services:
       - POSTGRES_PORT=5432
       - POSTGRES_DB=${POSTGRES_DB:-telemetryflow_db}
       - POSTGRES_USERNAME=${POSTGRES_USERNAME:-tfo_admin}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-telemetryflow123}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
 
       # ClickHouse
       - CLICKHOUSE_HOST=clickhouse
       - CLICKHOUSE_PORT=8123
       - CLICKHOUSE_DB=${CLICKHOUSE_DB:-telemetryflow_db}
       - CLICKHOUSE_USER=${CLICKHOUSE_USER:-tfo_admin}
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-telemetryflow123}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:?CLICKHOUSE_PASSWORD must be set}
 
       # Redis
       - REDIS_HOST=redis
@@ -421,12 +421,12 @@ services:
       - ENABLE_BULLMQ=${ENABLE_BULLMQ:-true}
 
       # JWT & Session
-      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me-in-production}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET must be set}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-24h}
-      - SESSION_SECRET=${SESSION_SECRET:-dev-session-secret-change-me}
+      - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET must be set}
 
       # CORS
-      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:8080}
 
       # Logging
       - LOGGER_TYPE=${LOGGER_TYPE:-winston}
