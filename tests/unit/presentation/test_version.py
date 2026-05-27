@@ -25,7 +25,7 @@ class TestVersion:
 
     def test_version_format(self) -> None:
         """Test version string format."""
-        assert __version__ == "1.1.1"
+        assert __version__ == "1.2.0"
 
     def test_short(self) -> None:
         """Test short version."""

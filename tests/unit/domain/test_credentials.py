@@ -80,7 +80,7 @@ class TestCredentials:
 
         assert headers["Authorization"] == "Bearer tfk_key123:tfs_secret456"
         assert headers["X-TelemetryFlow-Key-ID"] == "tfk_key123"
-        assert headers["X-TelemetryFlow-Key-Secret"] == "tfs_secret456"
+        assert "X-TelemetryFlow-Key-Secret" not in headers
 
     def test_equals_same_credentials(self) -> None:
         """Test equality with same credentials."""
@@ -112,7 +112,8 @@ class TestCredentials:
 
         assert "tfk_key123" in str_repr
         assert "verylongsecret" not in str_repr
-        assert "tfs_very..." in str_repr or "..." in str_repr
+        assert "tfs_very" not in str_repr
+        assert "***" in str_repr
 
     def test_immutability(self) -> None:
         """Test that credentials are immutable (frozen dataclass)."""

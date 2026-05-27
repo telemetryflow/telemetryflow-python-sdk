@@ -28,9 +28,10 @@ from typing import Any
 from telemetryflow.domain.credentials import Credentials
 
 _ENDPOINT_PATTERN = re.compile(
-    r"^[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?"
+    r"^(?:https?://)?"  # optional scheme
+    r"[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?"
     r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*"
-    r"(?::\d{1,5})?$"
+    r"(?::\d{1,5})?/?$"
 )
 
 
@@ -127,9 +128,7 @@ class TelemetryConfig:
         if not self.endpoint:
             errors.append("Endpoint is required")
         elif not _ENDPOINT_PATTERN.match(self.endpoint):
-            errors.append(
-                "Endpoint must be a valid host:port (e.g., api.example.com:4317)"
-            )
+            errors.append("Endpoint must be a valid host:port (e.g., api.example.com:4317)")
         if not self.service_name:
             errors.append("Service name is required")
         if self.timeout.total_seconds() <= 0:

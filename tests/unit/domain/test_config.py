@@ -343,7 +343,7 @@ class TestTelemetryConfig:
 
         assert "Authorization" in headers
         assert "X-TelemetryFlow-Key-ID" in headers
-        assert "X-TelemetryFlow-Key-Secret" in headers
+        assert "X-TelemetryFlow-Key-Secret" not in headers
 
     def test_get_auth_headers_with_collector_id(self, valid_credentials: Credentials) -> None:
         """Test get_auth_headers with collector ID."""
