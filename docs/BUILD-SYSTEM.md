@@ -331,6 +331,7 @@ make build
 ```
 
 Creates:
+
 - `dist/telemetryflow_python_sdk-1.2.0-py3-none-any.whl`
 
 - `dist/telemetryflow_python_sdk-1.2.0.tar.gz`

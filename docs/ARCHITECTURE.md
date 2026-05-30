@@ -76,12 +76,12 @@ graph TB
 
 The SDK follows DDD tactical patterns:
 
-| Pattern | Implementation | Purpose |
-|---------|---------------|---------|
+| Pattern            | Implementation    | Purpose                        |
+| ------------------ | ----------------- | ------------------------------ |
 | **Aggregate Root** | `TelemetryConfig` | Encapsulates all configuration |
-| **Value Object** | `Credentials` | Immutable API key pair |
-| **Entity** | N/A | Not needed for SDK use case |
-| **Repository** | N/A | Telemetry is write-only |
+| **Value Object**   | `Credentials`     | Immutable API key pair         |
+| **Entity**         | N/A               | Not needed for SDK use case    |
+| **Repository**     | N/A               | Telemetry is write-only        |
 
 ### 2. CQRS Pattern
 
@@ -658,13 +658,13 @@ flowchart TB
 
 ### Validation Points
 
-| Layer | Validation | Error Type |
-|-------|------------|------------|
-| Domain | Credentials format | `CredentialsError` |
-| Domain | Config completeness | `ConfigError` |
-| Builder | Required fields | `BuilderError` |
-| Client | Initialization state | `NotInitializedError` |
-| Infrastructure | Export errors | Logged, may retry |
+| Layer          | Validation           | Error Type            |
+| -------------- | -------------------- | --------------------- |
+| Domain         | Credentials format   | `CredentialsError`    |
+| Domain         | Config completeness  | `ConfigError`         |
+| Builder        | Required fields      | `BuilderError`        |
+| Client         | Initialization state | `NotInitializedError` |
+| Infrastructure | Export errors        | Logged, may retry     |
 
 ## Thread Safety
 
@@ -692,12 +692,12 @@ graph TB
 
 ### Thread Safety Mechanisms
 
-| Component | Mechanism | Protected Operations |
-|-----------|-----------|---------------------|
-| Client | `RLock` | initialize, shutdown |
-| Handler | `RLock` | initialization state |
-| Active Spans | `Lock` | span tracking dict |
-| Instruments | `Lock` | metric instruments cache |
+| Component    | Mechanism | Protected Operations     |
+| ------------ | --------- | ------------------------ |
+| Client       | `RLock`   | initialize, shutdown     |
+| Handler      | `RLock`   | initialization state     |
+| Active Spans | `Lock`    | span tracking dict       |
+| Instruments  | `Lock`    | metric instruments cache |
 
 ## Extension Points
 
@@ -766,12 +766,12 @@ mindmap
 
 ### Configuration Tuning
 
-| Parameter | Default | Tuning Guide |
-|-----------|---------|--------------|
-| `batch_timeout` | 10s | Lower for real-time, higher for efficiency |
-| `batch_max_size` | 512 | Higher for throughput, lower for latency |
-| `timeout` | 30s | Based on network conditions |
-| `compression` | true | Disable for low CPU environments |
+| Parameter        | Default | Tuning Guide                               |
+| ---------------- | ------- | ------------------------------------------ |
+| `batch_timeout`  | 10s     | Lower for real-time, higher for efficiency |
+| `batch_max_size` | 512     | Higher for throughput, lower for latency   |
+| `timeout`        | 30s     | Based on network conditions                |
+| `compression`    | true    | Disable for low CPU environments           |
 
 ## Best Practices
 

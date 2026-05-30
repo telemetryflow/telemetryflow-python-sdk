@@ -55,10 +55,9 @@ COPY src/ ./src/
 # Build the wheel package
 RUN pip install --upgrade pip build && \
     python -m build --wheel && \
-    pip wheel --wheel-dir=/wheels -r <(echo "opentelemetry-api>=1.28.0" && \
-                                       echo "opentelemetry-sdk>=1.28.0" && \
-                                       echo "opentelemetry-exporter-otlp-proto-grpc>=1.28.0" && \
-                                       echo "opentelemetry-exporter-otlp-proto-http>=1.28.0")
+    printf 'opentelemetry-api>=1.28.0\nopentelemetry-sdk>=1.28.0\nopentelemetry-exporter-otlp-proto-grpc>=1.28.0\nopentelemetry-exporter-otlp-proto-http>=1.28.0\n' > /tmp/reqs.txt && \
+    pip wheel --wheel-dir=/wheels -r /tmp/reqs.txt && \
+    rm -f /tmp/reqs.txt
 
 # -----------------------------------------------------------------------------
 # Stage 2: Runtime

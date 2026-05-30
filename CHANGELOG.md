@@ -123,6 +123,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Version Alignment (CVS)**: Fixed `version.py` from stale `1.1.1` to `1.2.0` matching `pyproject.toml` and `CHANGELOG.md`
 - **Version Alignment (CVS)**: Updated `Dockerfile` `ARG VERSION` and OCI labels from `1.1.1` to `1.2.0`
 - **Version Alignment (CVS)**: Updated `Dockerfile` build comments from `1.1.1` to `1.2.0`
+- **Docker Build Fix - .dockerignore**: Fixed `.dockerignore` excluding `LICENSE` file from Docker build context — changed from `LICENSE` to `!LICENSE` so the multi-stage `Dockerfile` can successfully `COPY LICENSE`
+- **Docker Build Fix - Shell Compatibility**: Fixed `Dockerfile` builder stage using bash process substitution `<()` which is unsupported in `/bin/sh` — replaced with POSIX-compliant `printf > /tmp/reqs.txt` approach for pip wheel requirements
+- **Security - Trivy Vulnerability Scan**: Verified zero vulnerabilities (CRITICAL/HIGH/MEDIUM) across all targets using Trivy v0.70.0:
+  - Source code filesystem scan: **0 vulnerabilities**
+  - Production Docker image (`python:3.14-slim` / Debian 13.5): **0 vulnerabilities**
+  - Development Docker image (`python:3.14-slim` / Debian 13.5): **0 vulnerabilities**
 
 ### SDK Configuration Structure
 

@@ -161,13 +161,13 @@ else:
 
 ## Span Kinds
 
-| Kind | Use Case |
-|------|----------|
+| Kind                | Use Case                      |
+| ------------------- | ----------------------------- |
 | `SpanKind.INTERNAL` | Internal operations (default) |
-| `SpanKind.SERVER` | Server-side request handling |
-| `SpanKind.CLIENT` | Client-side requests |
-| `SpanKind.PRODUCER` | Message queue producers |
-| `SpanKind.CONSUMER` | Message queue consumers |
+| `SpanKind.SERVER`   | Server-side request handling  |
+| `SpanKind.CLIENT`   | Client-side requests          |
+| `SpanKind.PRODUCER` | Message queue producers       |
+| `SpanKind.CONSUMER` | Message queue consumers       |
 
 ## Data Flow
 
@@ -204,6 +204,7 @@ Error: Failed to connect to api.telemetryflow.id:4317
 ```
 
 **Solutions:**
+
 1. Check your network connectivity
 2. Verify the endpoint is correct
 3. Try using HTTP protocol: `.with_http()`
@@ -215,6 +216,7 @@ Error: API key ID must start with 'tfk_'
 ```
 
 **Solutions:**
+
 1. Verify your API key format
 2. Ensure environment variables are set correctly
 3. Check for trailing whitespace in credentials
@@ -226,5 +228,6 @@ NotInitializedError: Client is not initialized. Call initialize() first.
 ```
 
 **Solutions:**
+
 1. Call `client.initialize()` before using the client
 2. Use the context manager pattern: `with ... as client:`

@@ -35,11 +35,11 @@ graph TB
 
 ### Overview
 
-| Command | Description |
-|---------|-------------|
-| `init` | Initialize TelemetryFlow in your project |
-| `example` | Generate example code |
-| `version` | Show version information |
+| Command   | Description                              |
+| --------- | ---------------------------------------- |
+| `init`    | Initialize TelemetryFlow in your project |
+| `example` | Generate example code                    |
+| `version` | Show version information                 |
 
 ## Command: init
 
@@ -53,17 +53,17 @@ telemetryflow-gen init [options]
 
 ### Options
 
-| Option | Short | Default | Description |
-|--------|-------|---------|-------------|
-| `--output` | `-o` | `.` | Output directory |
-| `--force` | `-f` | `false` | Overwrite existing files |
+| Option     | Short | Default | Description              |
+| ---------- | ----- | ------- | ------------------------ |
+| `--output` | `-o`  | `.`     | Output directory         |
+| `--force`  | `-f`  | `false` | Overwrite existing files |
 
 ### Output Files
 
-| File | Description |
-|------|-------------|
-| `.env.telemetryflow` | Environment configuration template |
-| `telemetryflow_example.py` | Basic usage example |
+| File                       | Description                        |
+| -------------------------- | ---------------------------------- |
+| `.env.telemetryflow`       | Environment configuration template |
+| `telemetryflow_example.py` | Basic usage example                |
 
 ### Example
 
@@ -146,17 +146,17 @@ telemetryflow-gen example [options]
 
 ### Options
 
-| Option | Short | Default | Description |
-|--------|-------|---------|-------------|
-| `--type` | `-t` | `basic` | Example type |
-| `--output` | `-o` | `.` | Output directory |
-| `--force` | `-f` | `false` | Overwrite existing files |
+| Option     | Short | Default | Description              |
+| ---------- | ----- | ------- | ------------------------ |
+| `--type`   | `-t`  | `basic` | Example type             |
+| `--output` | `-o`  | `.`     | Output directory         |
+| `--force`  | `-f`  | `false` | Overwrite existing files |
 
 ### Example Types
 
-| Type | Description | Output File |
-|------|-------------|-------------|
-| `basic` | Basic SDK usage | `basic_example.py` |
+| Type          | Description                      | Output File              |
+| ------------- | -------------------------------- | ------------------------ |
+| `basic`       | Basic SDK usage                  | `basic_example.py`       |
 | `http-server` | HTTP server with instrumentation | `http_server_example.py` |
 
 ### Example
@@ -175,6 +175,7 @@ telemetryflow-gen example -t http-server -o ./examples
 ### Basic Example Template
 
 The basic example demonstrates:
+
 - Client initialization and shutdown
 - Recording metrics (counter, gauge, histogram)
 - Emitting logs (info, warn, error, debug)
@@ -185,6 +186,7 @@ The basic example demonstrates:
 ### HTTP Server Example Template
 
 The HTTP server example demonstrates:
+
 - Full request instrumentation
 - Automatic span creation for requests
 - Request duration histogram
@@ -262,11 +264,13 @@ TELEMETRYFLOW_SERVICE_NAME=your-service-name
 ### Step 3: Load Environment
 
 Option A: Source the file:
+
 ```bash
 source .env.telemetryflow
 ```
 
 Option B: Use python-dotenv:
+
 ```python
 from dotenv import load_dotenv
 load_dotenv('.env.telemetryflow')
@@ -378,10 +382,10 @@ def main(argv: list[str] | None = None) -> int:
 
 ### Exit Codes
 
-| Code | Description |
-|------|-------------|
-| 0 | Success |
-| 1 | Error (file exists, invalid option, etc.) |
+| Code | Description                               |
+| ---- | ----------------------------------------- |
+| 0    | Success                                   |
+| 1    | Error (file exists, invalid option, etc.) |
 
 ## Related Documentation
 
